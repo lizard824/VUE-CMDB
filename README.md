@@ -1,6 +1,7 @@
 # cmdb
 
 > A Vue.js project
+>This is a project used for manage assets, including devices,vms,ip and domain.
 
 ## Build Setup
 
