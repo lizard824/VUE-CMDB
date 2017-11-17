@@ -456,38 +456,51 @@
       }
     },
     mounted(){
-      var distanceX,distanceY
-      function bodyMove(){
-        var oevent = ev || event;
-        dialog.style.left = oevent.clientX - distanceX + 'px';
-        dialog.style.top = oevent.clientY - distanceY + 'px';
-      }
-      function bodyDown(ev){
-        var oevent = ev || event;
+//      var distanceX,distanceY
+//      var dialog = document.getElementById("1")
+//      function bodyMove(ev){
+//        var oevent = ev || event;
+//        dialog.style.left = oevent.clientX - distanceX + 'px';
+//        dialog.style.top = oevent.clientY - distanceY + 'px';
+//      }
+//      function touchDown(ev){
+//        var oevent = ev || event;
+//
+//        distanceX = oevent.clientX - dialog.offsetLeft;
+//        distanceY = oevent.clientY - dialog.offsetTop;
+//
+//      }
+//      function touchUp(){
+//
+//        document.removeEventListener('mousemove',bodyMove,false)
+//        document.removeEventListener('mouseup',touchUp,false)
+//      }
+//      dialog.addEventListener('mousedown',touchDown,false)
+//      document.addEventListener('mousemove',bodyMove,false)
+//      document.addEventListener('mouseup',touchUp,false)
 
-        distanceX = oevent.clientX - dialog.offsetLeft;
-        distanceY = oevent.clientY - dialog.offsetTop;
-      }
+
       (function () {
         var dialog = document.getElementById("1")
 
-        dialog.addEventListener('mousedown',function (ev) {
+        dialog.onmousedown=function (ev) {
           var oevent = ev || event;
 
           var distanceX = oevent.clientX - dialog.offsetLeft;
           var distanceY = oevent.clientY - dialog.offsetTop;
           console.log(distanceX,distanceY)
 
-          document.addEventListener('mousemove',function (ev) {
+          document.body.onmousemove = function (ev) {
             var oevent = ev || event;
             dialog.style.left = oevent.clientX - distanceX + 'px';
             dialog.style.top = oevent.clientY - distanceY + 'px';
-          })
-          document.addEventListener('mouseup',function (ev) {
+          }
+          document.body.onmouseup=function (ev) {
+            document.body.onmousemove=null
+            document.body.onmouseup=null
+          }
 
-          })
-
-        })
+        }
       })()
     },
     methods: {

@@ -136,17 +136,18 @@
 
     <!--新增-->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogNewVisible">
-      <el-form :model="ctemp" status-icon :rules="rules" ref="ctemp" label-width="100px" class="demo-ruleForm">
+      <el-form :model="ctemp" status-icon :rules="rules" ref="temp" label-width="100px" class="demo-ruleForm">
+
         <el-form-item label="SN" :label-width="formLabelWidth" prop="sn">
           <el-input v-model="ctemp.sn" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="服务码" :label-width="formLabelWidth" prop="code">
           <el-input v-model="ctemp.code" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="老虎资产" :label-width="formLabelWidth" prop="lhzq_sn">
+        <el-form-item label="老虎资产" :label-width="formLabelWidth" prop="lhza_sn">
           <el-input v-model="ctemp.lhzq_sn" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="设备类别" :label-width="formLabelWidth" prop="asset_type">
+        <el-form-item label="设备类型" :label-width="formLabelWidth" prop="asset_type">
           <el-input v-model="ctemp.asset_type" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="厂商" :label-width="formLabelWidth" prop="oem" >
@@ -155,25 +156,11 @@
         <el-form-item label="型号" :label-width="formLabelWidth" prop="model" >
           <el-input v-model="ctemp.model" auto-complete="off" ></el-input>
         </el-form-item>
-        <el-form-item label="城市" :label-width="formLabelWidth" prop="city">
-          <el-input v-model="ctemp.city" auto-complete="off"></el-input>
+        <el-form-item label="机房" :label-width="formLabelWidth" prop="isp" >
+          <el-input v-model="ctemp.isp" auto-complete="off" ></el-input>
         </el-form-item>
-
-        <el-form-item label="续保时间" :label-width="formLabelWidth" prop="Renewal_first">
-          <el-input v-model="ctemp.Renewal_first" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="续保过期" :label-width="formLabelWidth" prop="Renewal_expiration">
-          <el-input v-model="ctemp.Renewal_expiration" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="配置" :label-width="formLabelWidth" prop="config" >
-          <el-input v-model="ctemp.config" auto-complete="off" ></el-input>
-        </el-form-item>
-        <el-form-item label="状态" :label-width="formLabelWidth" prop="status">
-          <el-select v-model="ctemp.status" placeholder="请选择状态">
-            <el-option label="正常" value=0></el-option>
-            <el-option label="故障" value=1></el-option>
-            <el-option label="下架" value=2></el-option>
-          </el-select>
+        <el-form-item label="机柜" :label-width="formLabelWidth" prop="name" >
+          <el-input v-model="ctemp.name" auto-complete="off" ></el-input>
         </el-form-item>
         <el-form-item label="外网地址" :label-width="formLabelWidth" prop="ip1" >
           <el-input v-model="ctemp.ip1" auto-complete="off" ></el-input>
@@ -184,8 +171,22 @@
         <el-form-item label="管理地址" :label-width="formLabelWidth" prop="ip3" >
           <el-input v-model="ctemp.ip3" auto-complete="off" ></el-input>
         </el-form-item>
-
-
+        <el-form-item label="状态" :label-width="formLabelWidth" prop="status">
+          <el-select v-model="ctemp.status" placeholder="请选择状态">
+            <el-option label="正常" value=0></el-option>
+            <el-option label="故障" value=1></el-option>
+            <el-option label="下架" value=2></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="配置" :label-width="formLabelWidth" prop="config" >
+          <el-input v-model="temp.config" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="购买时间" :label-width="formLabelWidth" prop="buy_time" >
+          <el-input v-model="temp.buy_time" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="续保时间" :label-width="formLabelWidth" prop="Renewal_first" >
+          <el-input v-model="temp.Renewal_first" auto-complete="off" ></el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogNewVisible = false">取 消</el-button>
@@ -196,27 +197,29 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form :model="temp" status-icon :rules="rules" ref="temp" label-width="100px" class="demo-ruleForm">
 
-        <el-form-item label="城市" :label-width="formLabelWidth" prop="city">
-          <el-input v-model="temp.city" auto-complete="off"></el-input>
+        <el-form-item label="SN" :label-width="formLabelWidth" prop="sn">
+          <el-input v-model="temp.sn" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="服务码" :label-width="formLabelWidth" prop="code">
           <el-input v-model="temp.code" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="续保时间" :label-width="formLabelWidth" prop="Renewal_first">
-          <el-input v-model="temp.Renewal_first" auto-complete="off"></el-input>
+        <el-form-item label="老虎资产" :label-width="formLabelWidth" prop="lhza_sn">
+          <el-input v-model="temp.lhzq_sn" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="续保过期" :label-width="formLabelWidth" prop="Renewal_expiration">
-          <el-input v-model="temp.Renewal_expiration" auto-complete="off"></el-input>
+        <el-form-item label="设备类型" :label-width="formLabelWidth" prop="asset_type">
+          <el-input v-model="temp.asset_type" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="配置" :label-width="formLabelWidth" prop="config" >
-          <el-input v-model="temp.config" auto-complete="off" ></el-input>
+        <el-form-item label="厂商" :label-width="formLabelWidth" prop="oem" >
+          <el-input v-model="temp.oem" auto-complete="off" ></el-input>
         </el-form-item>
-        <el-form-item label="状态" :label-width="formLabelWidth" prop="status">
-          <el-select v-model="temp.status" placeholder="请选择状态">
-            <el-option label="正常" value=0></el-option>
-            <el-option label="故障" value=1></el-option>
-            <el-option label="下架" value=2></el-option>
-          </el-select>
+        <el-form-item label="型号" :label-width="formLabelWidth" prop="model" >
+          <el-input v-model="temp.model" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="机房" :label-width="formLabelWidth" prop="isp" >
+          <el-input v-model="temp.isp" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="机柜" :label-width="formLabelWidth" prop="name" >
+          <el-input v-model="temp.name" auto-complete="off" ></el-input>
         </el-form-item>
         <el-form-item label="外网地址" :label-width="formLabelWidth" prop="ip1" >
           <el-input v-model="temp.ip1" auto-complete="off" ></el-input>
@@ -227,10 +230,22 @@
         <el-form-item label="管理地址" :label-width="formLabelWidth" prop="ip3" >
           <el-input v-model="temp.ip3" auto-complete="off" ></el-input>
         </el-form-item>
-        <el-form-item label="厂商" :label-width="formLabelWidth" prop="oem" >
-          <el-input v-model="temp.oem" auto-complete="off" ></el-input>
+        <el-form-item label="状态" :label-width="formLabelWidth" prop="status">
+          <el-select v-model="temp.status" placeholder="请选择状态">
+            <el-option label="正常" value=0></el-option>
+            <el-option label="故障" value=1></el-option>
+            <el-option label="下架" value=2></el-option>
+          </el-select>
         </el-form-item>
-
+        <el-form-item label="配置" :label-width="formLabelWidth" prop="config" >
+          <el-input v-model="temp.config" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="购买时间" :label-width="formLabelWidth" prop="buy_time" >
+          <el-input v-model="temp.buy_time" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="续保时间" :label-width="formLabelWidth" prop="Renewal_first" >
+          <el-input v-model="temp.Renewal_first" auto-complete="off" ></el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -241,27 +256,29 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogMultiVisible">
       <el-form :model="temp" status-icon :rules="rules" ref="temp" label-width="100px" class="demo-ruleForm">
 
-        <el-form-item label="城市" :label-width="formLabelWidth" prop="city">
-          <el-input v-model="temp.city" auto-complete="off"></el-input>
+        <el-form-item label="SN" :label-width="formLabelWidth" prop="sn">
+          <el-input v-model="temp.sn" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="服务码" :label-width="formLabelWidth" prop="code">
           <el-input v-model="temp.code" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="续保时间" :label-width="formLabelWidth" prop="Renewal_first">
-          <el-input v-model="temp.Renewal_first" auto-complete="off"></el-input>
+        <el-form-item label="老虎资产" :label-width="formLabelWidth" prop="lhza_sn">
+          <el-input v-model="temp.lhzq_sn" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="续保过期" :label-width="formLabelWidth" prop="Renewal_expiration">
-          <el-input v-model="temp.Renewal_expiration" auto-complete="off"></el-input>
+        <el-form-item label="设备类型" :label-width="formLabelWidth" prop="asset_type">
+          <el-input v-model="temp.asset_type" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="配置" :label-width="formLabelWidth" prop="config" >
-          <el-input v-model="temp.config" auto-complete="off" ></el-input>
+        <el-form-item label="厂商" :label-width="formLabelWidth" prop="oem" >
+          <el-input v-model="temp.oem" auto-complete="off" ></el-input>
         </el-form-item>
-        <el-form-item label="状态" :label-width="formLabelWidth" prop="status">
-          <el-select v-model="temp.status" placeholder="请选择状态">
-            <el-option label="正常" value=0></el-option>
-            <el-option label="故障" value=1></el-option>
-            <el-option label="下架" value=2></el-option>
-          </el-select>
+        <el-form-item label="型号" :label-width="formLabelWidth" prop="model" >
+          <el-input v-model="temp.model" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="机房" :label-width="formLabelWidth" prop="isp" >
+          <el-input v-model="temp.isp" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="机柜" :label-width="formLabelWidth" prop="name" >
+          <el-input v-model="temp.name" auto-complete="off" ></el-input>
         </el-form-item>
         <el-form-item label="外网地址" :label-width="formLabelWidth" prop="ip1" >
           <el-input v-model="temp.ip1" auto-complete="off" ></el-input>
@@ -272,10 +289,22 @@
         <el-form-item label="管理地址" :label-width="formLabelWidth" prop="ip3" >
           <el-input v-model="temp.ip3" auto-complete="off" ></el-input>
         </el-form-item>
-        <el-form-item label="厂商" :label-width="formLabelWidth" prop="oem" >
-          <el-input v-model="temp.oem" auto-complete="off" ></el-input>
+        <el-form-item label="状态" :label-width="formLabelWidth" prop="status">
+          <el-select v-model="temp.status" placeholder="请选择状态">
+            <el-option label="正常" value=0></el-option>
+            <el-option label="故障" value=1></el-option>
+            <el-option label="下架" value=2></el-option>
+          </el-select>
         </el-form-item>
-
+        <el-form-item label="配置" :label-width="formLabelWidth" prop="config" >
+          <el-input v-model="temp.config" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="购买时间" :label-width="formLabelWidth" prop="buy_time" >
+          <el-input v-model="temp.buy_time" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="续保时间" :label-width="formLabelWidth" prop="Renewal_first" >
+          <el-input v-model="temp.Renewal_first" auto-complete="off" ></el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogMultiVisible = false">取 消</el-button>
