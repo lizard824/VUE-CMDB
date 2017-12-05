@@ -1,10 +1,24 @@
 <template>
   <div class="app-container">
+    <div style="float: left; margin: 20px;" >
+      <el-upload
+        class="upload-demo"
+        action="http://cmdb.tigerbrokers.net:8000/ips/uploadIps"
+        :show-file-list= "false"
+        :on-error="uploadError"
+        :on-success="uploadSuccess">
+        <el-button  type="primary" v-if="this.$store.getters.perms.indexOf('31l')>-1 || this.$store.getters.perms.indexOf('5')>-1 ">点击上传</el-button>
+        <div slot="tip" class="el-upload__tip">只能上传xls/xlsx文件(文件格式遵循导出文件)</div>
+      </el-upload>
+    </div>
     <div style="float: right; margin:20px">
-      <el-button type="primary" icon="search" @click="dialogSearchVisible=true">搜索</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">添加</el-button>
-      <el-button class="filter-item" type="primary" icon="document" @click="handleDownload">导出</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" @click="dialogMultiVisible=true" type="primary" icon="edit">批量修改</el-button>
+      <el-button type="primary" icon="search" @click="dialogSearchVisible=true" v-if="this.$store.getters.perms.indexOf('31r')>-1  || this.$store.getters.perms.indexOf('5')>-1 ">搜索</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit" v-if="this.$store.getters.perms.indexOf('31c')>-1 ||  this.$store.getters.perms.indexOf('5')>-1 ">添加</el-button>
+      <el-button class="filter-item" type="primary" icon="document" @click="handleDownload" v-if="this.$store.getters.perms.indexOf('31l')>-1 || this.$store.getters.perms.indexOf('5')>-1 ">导出</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" @click="dialogMultiVisible=true" type="primary" icon="edit" v-if="this.$store.getters.perms.indexOf('31u')>-1  || this.$store.getters.perms.indexOf('5')>-1 ">批量修改</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" @click="MultiDelete" type="primary"
+                 icon="edit"v-if="this.$store.getters.perms.indexOf('31d')>-1 || this.$store.getters.perms.indexOf('5')>-1">批量删除
+      </el-button>
     </div>
 
     <el-table
@@ -61,10 +75,10 @@
 
       <el-table-column label="操作">
         <template scope="scope">
-          <el-button
+          <el-button v-if="perms.indexOf('31u')>-1  ||  perms.indexOf('5')>-1 "
             size="mini"
             @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button
+          <el-button v-if="perms.indexOf('31d')>-1 ||  perms.indexOf('5')>-1 "
             size="mini"
             type="danger"
             @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -324,11 +338,41 @@
       this.getList()
       console.log('geting list..')
     },
+    mounted() {
+
+      var dialog = document.querySelectorAll('div.el-dialog')
+      dialog.forEach(function (value,index,array) {
+        value.onmousedown = function(ev) {
+          var oevent = ev || event;
+
+          var distanceX = oevent.clientX - value.offsetLeft;
+          var distanceY = oevent.clientY - value.offsetTop;
+
+          document.onmousemove = function (ev) {
+            var oevent = ev || event;
+            value.style.left = oevent.clientX - distanceX -360+ 'px';
+            value.style.top = oevent.clientY - distanceY + 'px';
+          };
+          document.onmouseup = function () {
+            document.onmousemove = null;
+            document.onmouseup = null;
+          };
+        }
+      })
+
+
+    },
+    computed:{
+      perms(){
+        return this.$store.getters.perms
+      }
+    },
     methods:{
       getList(){
         this.listLoading = true
         axios.get('http://cmdb.tigerbrokers.net:8000/ips/getAll',{params:this.listQuery}).then(response=>{
           console.log(response.data);
+          console.log(this.listQuery)
           this.list = response.data.data
           console.log(response.data.total)
           this.total = response.data.total[0].total
@@ -348,6 +392,22 @@
           console.log(response.data.total)
           this.total = response.data.total[0].total
           this.listLoading = false
+          if(response.data.code=='20000'){
+            this.$notify({
+              title: '成功',
+              message: response.data.msg,
+              type: 'success',
+              duration: 5000
+            })
+          }else{
+            this.$notify({
+              title: '失败',
+              message: response.data.msg,
+              type: 'warning',
+              duration: 5000
+            })
+          }
+          this.$refs.listQuery.resetFields()
 
         }).catch((err) => {
           console.log(err)
@@ -371,8 +431,8 @@
         this.temp = Object.assign({}, row)
         this.transferSelect.splice(0,1,row.ips_id)
         this.temp.ips_id = this.transferSelect
-        console.log(this.$store.getters.name)
-        this.temp.last_editor = this.$store.getters.name
+        console.log(this.$store.getters.username)
+        this.temp.last_editor = this.$store.getters.username
         this.temp.update_date = this.transferDate(date)
         console.log(this.temp)
         this.dialogFormVisible = true
@@ -381,13 +441,21 @@
         console.log(row)
         axios.post('http://cmdb.tigerbrokers.net:8000/ips/deleteIps', {ips_id: [row.ips_id]}).then(response => {
           console.log(response.data);
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
-
-          })
+          if(response.data.code=='20000'){
+            this.$notify({
+              title: '成功',
+              message: response.data.msg,
+              type: 'success',
+              duration: 5000
+            })
+          }else{
+            this.$notify({
+              title: '失败',
+              message: response.data.msg,
+              type: 'warning',
+              duration: 5000
+            })
+          }
           const index = this.list.indexOf(row)
           this.list.splice(index, 1)
         }).catch(error => {
@@ -401,7 +469,7 @@
         this.ctemp.create_date = time
         this.ctemp.update_date = time
 
-        this.ctemp.last_editor = this.$store.getters.name
+        this.ctemp.last_editor = this.$store.getters.username
         console.log(this.ctemp)
       },
       handleDownload() {
@@ -448,12 +516,21 @@
         axios.post('http://cmdb.tigerbrokers.net:8000/ips/editIps', this.temp).then(response => {
           console.log(response)
           this.dialogFormVisible = false
-          this.$notify({
-            title: '成功',
-            message: '修改成功',
-            type: 'success',
-            duration: 2000
-          })
+          if(response.data.code=='20000'){
+            this.$notify({
+              title: '成功',
+              message: response.data.msg,
+              type: 'success',
+              duration: 5000
+            })
+          }else{
+            this.$notify({
+              title: '失败',
+              message: response.data.msg,
+              type: 'warning',
+              duration: 5000
+            })
+          }
           this.getList()
         }).catch(function (error) {
           console.log(error)
@@ -473,12 +550,21 @@
         console.log(this.temp)
         axios.post('http://cmdb.tigerbrokers.net:8000/ips/editIps', this.temp).then(response => {
           console.log(response.data);
-          this.$notify({
-            title: '成功',
-            message: '修改成功',
-            type: 'success',
-            duration: 2000
-          })
+          if(response.data.code=='20000'){
+            this.$notify({
+              title: '成功',
+              message: response.data.msg,
+              type: 'success',
+              duration: 5000
+            })
+          }else{
+            this.$notify({
+              title: '失败',
+              message: response.data.msg,
+              type: 'warning',
+              duration: 5000
+            })
+          }
           this.dialogMultiVisible = false
           this.getList()
         }).catch(error => {
@@ -494,12 +580,21 @@
             ).then(response => {
               console.log(response)
               this.dialogNewVisible = false
-              this.$notify({
-                title: '成功',
-                message: '增加成功',
-                type: 'success',
-                duration: 2000
-              })
+              if(response.data.code=='20000'){
+                this.$notify({
+                  title: '成功',
+                  message: response.data.msg,
+                  type: 'success',
+                  duration: 5000
+                })
+              }else{
+                this.$notify({
+                  title: '失败',
+                  message: response.data.msg,
+                  type: 'warning',
+                  duration: 5000
+                })
+              }
               this.getList()
             }).catch(function (error) {
               console.log(error)
@@ -510,6 +605,63 @@
         })
 
 
+      },
+      //上传文件
+      uploadError(){
+        this.$notify({
+          title: '失败',
+          message: '上传失败',
+          type: 'warning',
+          duration: 5000
+
+        })
+      },
+      //上传成功后判断 是否录入
+      uploadSuccess(response,file,fileList) {
+
+        console.log(response)
+        if (response.code == '50000') {
+          this.$notify({
+            title: '失败',
+            message: response.msg,
+            type: 'warning',
+            duration: 5000
+
+          })
+        }
+        else {
+          this.$notify({
+            title: '成功',
+            message: response.msg,
+            type: 'success',
+            duration: 5000
+
+          })
+          this.getList()
+        }
+      },
+      //批量删除
+      MultiDelete() {
+        this.multipleSelection = []
+        this.setList.forEach((item, i) => {
+
+          this.multipleSelection.push(item.idc_id);
+
+        })
+        axios.post('http://cmdb.tigerbrokers.net:8000/ips/deleteIps', {idc_id: this.multipleSelection}).then(response => {
+          console.log(response.data);
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+
+          })
+          this.getList()
+//          const index = this.list.indexOf(row)
+//          this.list.splice(index, 1)
+        }).catch(error => {
+        })
       },
 
     }

@@ -76,8 +76,8 @@ export const asyncRouterMap = [
     name:'资产信息',
     icon: 'zujian',
     children:[
-      {path:'assetDevice', component: DeviceAssets, name: '物理资产'},
-      {path:'assetVm', component: VmAssets, name:'虚拟资产'}
+      {path:'assetDevice', component: DeviceAssets, name: '物理资产',meta:{perm:['11','11c','11u','11r','11d']}},
+      {path:'assetVm', component: VmAssets, name:'虚拟资产',meta:{perm:['12','12c','12u','12r','12d']}}
     ]
   },
   {
@@ -87,7 +87,7 @@ export const asyncRouterMap = [
     noDropdown:true,
     icon: 'zujian',
     children:[
-      {path:'app', component: VmApp, name:'应用信息'}
+      {path:'app', component: VmApp, name:'应用信息',meta:{perm:['2','2c','2u','2r','2d']}}
     ]
   },
   {
@@ -97,8 +97,8 @@ export const asyncRouterMap = [
     name:'IP地址',
     icon: 'zujian',
     children:[
-      {path:'ips', component: Ips, name: 'IP地址段管理'},
-      {path:'ip', component: Ip, name:'IP地址管理'}
+      {path:'ips', component: Ips, name: '地址段管理',meta:{perm:['31','31c','31u','31r','31d']}},
+      {path:'ip', component: Ip, name:'地址管理',meta:{perm:['32','32u','32r','32l']}}
     ]
   },
   {
@@ -107,7 +107,7 @@ export const asyncRouterMap = [
     redirect: '/idcs/idc',
     icon:'zujian',
     noDropdown: true,
-    children: [{ path: 'idc', component:Idc, name: '机房管理'}]
+    children: [{ path: 'idc', component:Idc, name: '机房管理',meta:{perm:['4','4c','4u','4r','4d']}}]
   },
 
 
@@ -117,7 +117,7 @@ export const asyncRouterMap = [
     redirect: '/users/user',
     icon:'yonghuming',
     noDropdown: true,
-    children: [{ path: 'user', component:User, name: '用户管理', meta:{role:['admin']}}]
+    children: [{ path: 'user', component:User, name: '用户管理', meta:{perm:['5']}}]
   },
 
   { path: '*', redirect: '/404', hidden: true }

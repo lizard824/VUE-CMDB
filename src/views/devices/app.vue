@@ -388,8 +388,8 @@
         this.temp = Object.assign({}, row)
         this.transferSelect.splice(0,1,row.ips_id)
         this.temp.ips_id = this.transferSelect
-        console.log(this.$store.getters.name)
-        this.temp.last_editor = this.$store.getters.name
+        console.log(this.$store.getters.username)
+        this.temp.last_editor = this.$store.getters.username
         this.temp.update_date = this.transferDate(date)
         console.log(this.temp)
         this.dialogFormVisible = true
@@ -418,7 +418,7 @@
         this.ctemp.create_date = time
         this.ctemp.update_date = time
 
-        this.ctemp.last_editor = this.$store.getters.name
+        this.ctemp.last_editor = this.$store.getters.username
         console.log(this.ctemp)
       },
       handleDownload() {

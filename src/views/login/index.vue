@@ -21,7 +21,7 @@
           登录
         </el-button>
       </el-form-item>
-      <div class='tips'>账号:admin 123456</div>
+      <!--<div class='tips'>账号:admin 123456</div>-->
       <!--<div class='tips'>账号:editor  密码随便填</div>-->
     </el-form>
   </div>
@@ -34,7 +34,7 @@ export default {
   name: 'login',
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!isvalidUsername(value)) {
+      if (!value) {
         callback(new Error('请输入正确的用户名'))
       } else {
         callback()
@@ -50,7 +50,7 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: '123456'
+        password: 'A>-Fd},YP@'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],

@@ -1,37 +1,24 @@
 <template>
   <div class="app-container">
   <el-table
-    :data="tableData"
+    :data="list"
     border
     style="width: 100%">
     <el-table-column
-      label="日期"
-      width="180">
-      <template scope="scope">
-        <el-icon name="time"></el-icon>
-        <span style="margin-left: 10px">{{ scope.row.date }}</span>
-      </template>
+      label="用户名"
+      prop="username" sortable>
     </el-table-column>
     <el-table-column
-      label="姓名"
-      width="180">
-      <template scope="scope">
-        <el-popover trigger="hover" placement="top">
-          <p>姓名: {{ scope.row.name }}</p>
-          <p>权限: {{ scope.row.privilege }}</p>
-          <div slot="reference" class="name-wrapper">
-            <el-tag>{{ scope.row.name }}</el-tag>
-          </div>
-          <p>城市：{{ scope.row.cities}}</p>
-        </el-popover>
-      </template>
+      label="权限"
+      prop="perms" sortable>
     </el-table-column>
+
+
     <el-table-column label="操作">
       <template scope="scope">
         <el-button
           size="small"
-          @click="handleEdit(scope.row)">编辑</el-button>
-
+          @click="handleEdit(scope.$index,scope.row)">编辑</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -51,8 +38,8 @@
         :props="defaultProps">
       </el-tree>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="getCheckedNodes">通过 node 获取</el-button>
-        <el-button @click="getCheckedKeys">通过 key 获取</el-button>
+        <!--<el-button @click="getCheckedNodes">通过 node 获取</el-button>-->
+        <!--<el-button @click="getCheckedKeys">通过 key 获取</el-button>-->
 
         <el-button @click="dialogFormVisible = false">取 消</el-button>
         <el-button type="primary" @click="update">确 定</el-button>
@@ -62,98 +49,209 @@
 </template>
 
 <script>
-
+  import axios from 'axios'
   export default {
     data() {
       return {
         formLabelWidth: '120px',
         pivileage: null,
-        checkedKey:[2,3,4,5],
+        checkedKey:null,
         isIndeterminate: true,
         list: null,
         total: null,
+        choices:null,
         listLoading: true,
         listQuery: {
           page:1,
-          limit: 20,
-          name:''
+          pagesize: 20,
 
         },
         temp:{
-          date:'',
-          cities:'',
-          name:'',
-          privilege:''
+          username:'',
+          perms:''
 
         },
         dialogFormVisible: false,
         dialogStatus: '',
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          privilege: '1',
-          cities:''
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          privilege: '3',
-          cities:''
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          privilege: '8',
-          cities:''
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          privilege: '32',
-          cities:''
-        }],
+//        tableData: [{
+//          date: '2016-05-02',
+//          name: '王小虎',
+//          privilege: '1',
+//          cities:''
+//        }, {
+//          date: '2016-05-04',
+//          name: '王小虎',
+//          privilege: '3',
+//          cities:''
+//        }, {
+//          date: '2016-05-01',
+//          name: '王小虎',
+//          privilege: '8',
+//          cities:''
+//        }, {
+//          date: '2016-05-03',
+//          name: '王小虎',
+//          privilege: '32',
+//          cities:''
+//        }],
         data2: [{
-          id: 1,
-          label: 'Device',
+          id: '1',
+          label: '资产信息',
           children: [{
-            id:5,
-            label: 'App'},
+            id:'11',
+            label: '物理资产',
+            children:[{
+              id:'11c',
+              label:'增加'
+            },{
+              id:'11u',
+              label:'修改'
+            },{
+              id:'11r',
+              label:'查询'
+            },{
+              id:'11d',
+              label:'删除'
+            },{
+              id:'11l',
+              label:'上传'
+            }]},
             {
-              id:3,
-              label: 'Asset'
+              id:'12',
+              label: '虚拟资产',
+              children:[{
+                id:'12c',
+                label:'增加'
+              },{
+                id:'12u',
+                label:'修改'
+              },{
+                id:'12r',
+                label:'查询'
+              },{
+                id:'12d',
+                label:'删除'
+              },{
+                id:'12l',
+                label:'上传'
+              }]
           }]
         }, {
-          id: 2,
-          label: 'VM',
-          children: [{
-            id: 5,
-            label: 'App'
-          }, {
-            id: 6,
-            label: 'Asset'
+          id: '2',
+          label: '应用信息',
+          children:[{
+            id:'2c',
+            label:'增加'
+          },{
+            id:'2u',
+            label:'修改'
+          },{
+            id:'2r',
+            label:'查询'
+          },{
+            id:'2d',
+            label:'删除'
+          },{
+            id:'2l',
+            label:'上传'
           }]
-        }, {
-          id: 3,
-          label: 'IPS',
+        },{
+          id: '3',
+          label: 'IP地址',
           children: [{
-            id: 8,
-            label: 'IPS'
-          }, {
-            id: 9,
-            label: 'IP'
+            id:'31',
+            label: 'IP地址段',
+            children:[{
+              id:'31c',
+              label:'增加'
+            },{
+              id:'31u',
+              label:'修改'
+            },{
+              id:'31r',
+              label:'查询'
+            },{
+              id:'31d',
+              label:'删除'
+            },{
+              id:'31l',
+              label:'上传'
+            }]},
+            {
+              id:'32',
+              label: 'IP',
+              children:[{
+                id:'32u',
+                label:'修改'
+              },{
+                id:'32r',
+                label:'查询'
+              },{
+                id:'32l',
+                label:'上传'
+              }]
+            }]
+        } ,{
+          id: '4',
+          label: 'IDC机房',
+          children:[{
+            id:'4c',
+            label:'增加'
+          },{
+            id:'4u',
+            label:'修改'
+          },{
+            id:'4r',
+            label:'查询'
+          },{
+            id:'4d',
+            label:'删除'
+          },{
+            id:'4l',
+            label:'上传'
           }]
-        },
-          {
-            id: 4,
-            label: 'User',
-
-          }],
+        },{
+          id:'5',
+          label:'User'
+        }],
         defaultProps: {
           children: 'children',
           label: 'label'
         }
       }
     },
+    created(){
+      this.getList()
+      console.log('geting list..')
+    },
     methods: {
-      handleEdit(row){
+      getList(){
+        this.listLoading = true
+        axios.get('http://cmdb.tigerbrokers.net:8000/user/getPerms',{params:this.listQuery}).then(response=>{
+          console.log(response.data);
+          this.list = response.data.data
+          console.log(response.data.total)
+          this.total = response.data.total[0].total
+          this.listLoading = false
+        }).catch((err)=> {
+          console.log(err)
+        })
+
+
+      },
+      handleSizeChange(val) {
+        this.listQuery.pagesize = val
+        this.getList()
+      },
+      handleCurrentChange(val) {
+        this.listQuery.page = val
+        this.getList()
+      },
+      handleEdit(index,row){
+        console.log(row)
         this.temp = Object.assign({},row)
+        this.checkedKey=this.temp.perms.split(',')
+        console.log(this.checkedKey)
         this.dialogStatus = 'edit'
         this.dialogFormVisible = true
       },
@@ -161,15 +259,24 @@
         console.log(index, row);
       },
       update(){
-        this.cities = this.$refs.tree.getCheckedKeys();
-        console.log(this.cities)
-        this.dialogFormVisible = false
-        this.$notify({
-          title: '成功',
-          message: '更新成功',
-          type: 'success',
-          duration: 2000
+        this.choices = this.$refs.tree.getCheckedKeys();
+        console.log(this.choices)
+        this.temp.perms=this.choices.toString()
+
+        axios.post('http://cmdb.tigerbrokers.net:8000/user/editPerms',this.temp).then(response=>{
+          console.log(response.data)
+          this.dialogFormVisible = false
+          this.$notify({
+            title: '成功',
+            message: response.data.msg,
+            type: 'success',
+            duration: 2000
+          })
+          this.getList()
+        }).catch((err)=>{
+          console.log(err)
         })
+
       },
       getCheckedNodes(){
         console.log(this.$refs.tree.getCheckedNodes());
@@ -177,12 +284,6 @@
       getCheckedKeys() {
         console.log(this.$refs.tree.getCheckedKeys());
       }
-    },
-
-    mounted(){
-      this.list = this.tableData
-      this.listLoading = false
-
-    },
+    }
   }
 </script>

@@ -7,22 +7,25 @@
         :show-file-list= "false"
         :on-error="uploadError"
         :on-success="uploadSuccess">
-        <el-button  type="primary" >点击上传</el-button>
+        <el-button  type="primary" v-if="this.$store.getters.perms.indexOf('4l')>-1 || this.$store.getters.perms.indexOf('5')>-1">点击上传</el-button>
         <div slot="tip" class="el-upload__tip">只能上传xls/xlsx文件(文件格式遵循导出文件)</div>
       </el-upload>
     </div>
     <div style="float: right; margin:20px">
-      <el-button type="primary" icon="search" @click="dialogSearchVisible=true">搜索</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">添加
+      <el-button type="primary" icon="search" @click="dialogSearchVisible=true" v-if="this.$store.getters.perms.indexOf('4r')>-1 || this.$store.getters.perms.indexOf('5')>-1">搜索</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit" v-if="this.$store.getters.perms.indexOf('4u')>-1 || this.$store.getters.perms.indexOf('5')>-1">添加
       </el-button>
-      <el-button class="filter-item" type="primary" icon="document" @click="handleDownload">导出</el-button>
+      <el-button class="filter-item" type="primary" icon="document" @click="handleDownload" v-if="this.$store.getters.perms.indexOf('4l')>-1 || this.$store.getters.perms.indexOf('5')>-1">导出</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" @click="dialogMultiVisible=true" type="primary"
-                 icon="edit">批量修改
+                 icon="edit"v-if="this.$store.getters.perms.indexOf('4u')>-1 || this.$store.getters.perms.indexOf('5')>-1">批量修改
+      </el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" @click="MultiDelete" type="primary"
+                 icon="edit"v-if="this.$store.getters.perms.indexOf('4d')>-1 || this.$store.getters.perms.indexOf('5')>-1">批量删除
       </el-button>
 
-      <el-button class="filter-item" style="margin-left: 10px;" @click="MultiDelete" type="danger"
-                 icon="edit">批量删除
-      </el-button>
+      <!--<el-button class="filter-item" style="margin-left: 10px;" @click="MultiDelete" type="danger"-->
+                 <!--icon="edit">批量删除-->
+      <!--</el-button>-->
     </div>
 
     <el-table
@@ -99,11 +102,11 @@
 
       <el-table-column label="操作">
         <template scope="scope">
-          <el-button
+          <el-button  v-if="perms.indexOf('4u')>-1 || perms.indexOf('5')>-1"
             size="mini"
             @click="handleEdit(scope.$index, scope.row)">编辑
           </el-button>
-          <el-button
+          <el-button  v-if="perms.indexOf('4d')>-1 || perms.indexOf('5')>-1"
             size="mini"
             type="danger"
             @click="handleDelete(scope.$index, scope.row)">删除
@@ -111,6 +114,8 @@
         </template>
       </el-table-column>
     </el-table>
+
+
 
     <div v-show="!listLoading" class="pagination-container">
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
@@ -121,7 +126,7 @@
     </div>
 
     <!--新增-->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogNewVisible" id="1" :width="200">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogNewVisible" width="550px">
       <el-form :model="ctemp" status-icon :rules="rules" ref="ctemp" label-width="100px" class="demo-ruleForm">
         <el-form-item label="运营商" :label-width="formLabelWidth" prop="isp">
           <el-input v-model="ctemp.isp" auto-complete="off"></el-input>
@@ -158,7 +163,7 @@
       </div>
     </el-dialog>
     <!--editdialog-->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="550px">
       <el-form :model="temp">
         <el-form-item label="运营商" :label-width="formLabelWidth">
           <el-input v-model="temp.isp" auto-complete="off"></el-input>
@@ -183,7 +188,7 @@
         </el-form-item>
         <el-form-item label="状态" :label-width="formLabelWidth" prop="status">
 
-          <el-select v-model="temp.status " placeholder="请选择状态">
+          <el-select v-model="temp.status " placeholder="请选择状态" @change="changeValue">
 
             <el-option label="已使用" value=0></el-option>
             <el-option label="未使用" value=1></el-option>
@@ -197,7 +202,7 @@
       </div>
     </el-dialog>
     <!--批量-->
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogMultiVisible">
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogMultiVisible" width="550px">
       <el-form :model="temp">
         <el-form-item label="运营商" :label-width="formLabelWidth">
           <el-input v-model="temp.isp" auto-complete="off"></el-input>
@@ -234,7 +239,7 @@
       </div>
     </el-dialog>
     <!--复合搜索-->
-    <el-dialog title="搜索" :visible.sync="dialogSearchVisible">
+    <el-dialog title="搜索" :visible.sync="dialogSearchVisible" width="550px">
       <el-form :model="listQuery">
         <el-form-item label="运营商" :label-width="formLabelWidth">
           <el-input v-model="listQuery.isp" auto-complete="off"></el-input>
@@ -296,6 +301,7 @@
   import axios from 'axios'
   import {parseTime} from '@/utils'
   import {move} from '@/utils/drag'
+
 
   window.onload = move
   export default {
@@ -453,56 +459,59 @@
         }
 
 
+      },
+      reverseMessage:{
+        get:function(){
+          return this.temp.status
+          console.log(this.temp.status)
+        },
+        set:function(val){
+          console.log(val)
+          if(val.indexOf('已使用')>-1){
+            this.temp.status= 0
+            console.log(11111)
+          }
+          if(val.indexOf('未使用')>-1){
+            this.temp.status = 1
+          }
+        }
+      },
+      perms(){
+        return this.$store.getters.perms
       }
     },
-    mounted(){
-//      var distanceX,distanceY
-//      var dialog = document.getElementById("1")
-//      function bodyMove(ev){
-//        var oevent = ev || event;
-//        dialog.style.left = oevent.clientX - distanceX + 'px';
-//        dialog.style.top = oevent.clientY - distanceY + 'px';
-//      }
-//      function touchDown(ev){
-//        var oevent = ev || event;
-//
-//        distanceX = oevent.clientX - dialog.offsetLeft;
-//        distanceY = oevent.clientY - dialog.offsetTop;
-//
-//      }
-//      function touchUp(){
-//
-//        document.removeEventListener('mousemove',bodyMove,false)
-//        document.removeEventListener('mouseup',touchUp,false)
-//      }
+    mounted() {
+
+      var dialog = document.querySelectorAll('div.el-dialog')
+      dialog.forEach(function (value,index,array) {
+        value.onmousedown = function(ev) {
+          var oevent = ev || event;
+
+
+          var distanceX = oevent.clientX - value.offsetLeft;
+          var distanceY = oevent.clientY - value.offsetTop;
+          console.log('%c%s%s%s%s%s%s%s%s','color:Yellow','Y:',distanceY,'X:',distanceX,'offsetL:',value.offsetLeft,'offsetT:',value.offsetTop)
+          document.onmousemove = function (ev) {
+            var oevent = ev || event;
+            value.style.left = oevent.clientX - distanceX -360+ 'px';
+            value.style.top = oevent.clientY - distanceY + 'px';
+          };
+          document.onmouseup = function () {
+            document.onmousemove = null;
+            document.onmouseup = null;
+          };
+        }
+      })
+
+
+    }
 //      dialog.addEventListener('mousedown',touchDown,false)
 //      document.addEventListener('mousemove',bodyMove,false)
 //      document.addEventListener('mouseup',touchUp,false)
 
 
-      (function () {
-        var dialog = document.getElementById("1")
 
-        dialog.onmousedown=function (ev) {
-          var oevent = ev || event;
-
-          var distanceX = oevent.clientX - dialog.offsetLeft;
-          var distanceY = oevent.clientY - dialog.offsetTop;
-          console.log(distanceX,distanceY)
-
-          document.body.onmousemove = function (ev) {
-            var oevent = ev || event;
-            dialog.style.left = oevent.clientX - distanceX + 'px';
-            dialog.style.top = oevent.clientY - distanceY + 'px';
-          }
-          document.body.onmouseup=function (ev) {
-            document.body.onmousemove=null
-            document.body.onmouseup=null
-          }
-
-        }
-      })()
-    },
+    ,
     methods: {
       getList() {
         this.listLoading = true
@@ -527,7 +536,21 @@
           console.log(response.data.total)
           this.total = response.data.total[0].total
           this.listLoading = false
-
+          if(response.data.code=='20000'){
+            this.$notify({
+              title: '成功',
+              message: response.data.msg,
+              type: 'success',
+              duration: 5000
+            })
+          }else{
+            this.$notify({
+              title: '失败',
+              message: response.data.msg,
+              type: 'warning',
+              duration: 5000
+            })
+          }
 
         }).catch((err) => {
           console.log(err)
@@ -553,8 +576,8 @@
 
         this.temp.idc_id = this.transferSelect
         this.filterMessage = this.temp.status
-        console.log(this.$store.getters.name)
-        this.temp.last_editor = this.$store.getters.name
+        console.log(this.$store.getters.username)
+        this.temp.last_editor = this.$store.getters.username
         this.temp.update_date = this.transferDate(date)
         console.log(this.temp)
         this.dialogFormVisible = true
@@ -576,13 +599,21 @@
         }).then(action => {
           axios.post('http://cmdb.tigerbrokers.net:8000/idcs/deleteIdc', {idc_id: [row.idc_id]}).then(response => {
             console.log(response.data);
-            this.$notify({
-              title: '成功',
-              message: '删除成功',
-              type: 'success',
-              duration: 2000
-
-            })
+            if(response.data.code=='20000'){
+              this.$notify({
+                title: '成功',
+                message: response.data.msg,
+                type: 'success',
+                duration: 5000
+              })
+            }else{
+              this.$notify({
+                title: '失败',
+                message: response.data.msg,
+                type: 'warning',
+                duration: 5000
+              })
+            }
             const index = this.list.indexOf(row)
             this.list.splice(index, 1)
           }).catch(error => {
@@ -603,7 +634,7 @@
         this.ctemp.create_date = time
         this.ctemp.update_date = time
 
-        this.ctemp.last_editor = this.$store.getters.name
+        this.ctemp.last_editor = this.$store.getters.username
         console.log(this.ctemp)
       },
       //下载
@@ -647,15 +678,27 @@
       },
       //修改
       update() {
+
+        this.reverseMessage = this.temp.status
+        console.log(this.reverseMessage)
         axios.post('http://cmdb.tigerbrokers.net:8000/idcs/editIdc', this.temp).then(response => {
           console.log(response)
           this.dialogFormVisible = false
-          this.$notify({
-            title: '成功',
-            message: '修改成功',
-            type: 'success',
-            duration: 2000
-          })
+          if(response.data.code=='20000'){
+            this.$notify({
+              title: '成功',
+              message: response.data.msg,
+              type: 'success',
+              duration: 5000
+            })
+          }else{
+            this.$notify({
+              title: '失败',
+              message: response.data.msg,
+              type: 'warning',
+              duration: 5000
+            })
+          }
           this.getList()
         }).catch(function (error) {
           console.log(error)
@@ -677,16 +720,25 @@
 
         this.temp.update_date = this.transferDate(date)
         this.temp.idc_id = this.multipleSelection
-
+        this.reverseMessage=this.temp.status
         console.log(this.temp)
         axios.post('http://cmdb.tigerbrokers.net:8000/idcs/editIdc', this.temp).then(response => {
           console.log(response.data);
-          this.$notify({
-            title: '成功',
-            message: '修改成功',
-            type: 'success',
-            duration: 2000
-          })
+          if(response.data.code=='20000'){
+            this.$notify({
+              title: '成功',
+              message: response.data.msg,
+              type: 'success',
+              duration: 5000
+            })
+          }else{
+            this.$notify({
+              title: '失败',
+              message: response.data.msg,
+              type: 'warning',
+              duration: 5000
+            })
+          }
           this.dialogMultiVisible = false
           this.getList()
         }).catch(error => {
@@ -711,13 +763,14 @@
 
           })
           this.getList()
-          const index = this.list.indexOf(row)
-          this.list.splice(index, 1)
+//          const index = this.list.indexOf(row)
+//          this.list.splice(index, 1)
         }).catch(error => {
         })
       },
       //新增
       create() {
+
         this.$refs.ctemp.validate((valid)=>{
 
           if(valid){
@@ -726,12 +779,21 @@
               console.log(response)
 
               this.dialogNewVisible = false
-              this.$notify({
-                title: '成功',
-                message: '增加成功',
-                type: 'success',
-                duration: 2000
-              })
+              if(response.data.code=='20000'){
+                this.$notify({
+                  title: '成功',
+                  message: response.data.msg,
+                  type: 'success',
+                  duration: 5000
+                })
+              }else{
+                this.$notify({
+                  title: '失败',
+                  message: response.data.msg,
+                  type: 'warning',
+                  duration: 5000
+                })
+              }
               this.$refs.ctemp.resetFields()
               this.getList()
 
@@ -780,7 +842,12 @@
           })
           this.getList()
         }
+      },
+      changeValue(value){
+        console.log(value);
       }
+
+
     }
 
   }

@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-container">
     <div class='dashboard-text'>Welcome to use CMDB</div>
-    <div class='dashboard-text'>{{name}}</div>
+    <div class='dashboard-text'>{{username}}</div>
   </div>
 </template>
 
@@ -11,8 +11,8 @@ export default {
   name: 'dashboard',
   computed: {
     ...mapGetters([
-      'name',
-      'roles'
+      'username',
+      'perms'
     ])
   }
 }

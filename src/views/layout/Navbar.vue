@@ -4,8 +4,8 @@
     <levelbar></levelbar>
     <el-dropdown class="avatar-container" trigger="click">
       <div class="avatar-wrapper">
-        <span style="text-align: center">{{name}}</span>
-        <img class="user-avatar" :src="avatar+'?imageView2/1/w/80/h/80'">
+        <span style="text-align: center">{{username}}</span>
+        <!--<img class="user-avatar" :src="avatar+'?imageView2/1/w/80/h/80'">-->
         <i class="el-icon-caret-bottom"></i>
       </div>
       <el-dropdown-menu class="user-dropdown" slot="dropdown">
@@ -34,7 +34,7 @@ export default {
     ...mapGetters([
       'sidebar',
       'avatar',
-      'name'
+      'username'
     ])
   },
   methods: {
@@ -44,6 +44,7 @@ export default {
     logout() {
       this.$store.dispatch('LogOut').then(() => {
         location.reload()  // 为了重新实例化vue-router对象 避免bug
+//        this.$router.push({ path: '/' })
       })
     }
   }

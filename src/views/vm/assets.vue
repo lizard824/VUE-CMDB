@@ -1,10 +1,24 @@
 <template>
   <div class="app-container">
+    <div style="float: left; margin: 20px;" >
+      <el-upload
+        class="upload-demo"
+        action="http://cmdb.tigerbrokers.net:8000/vms/uploadVm"
+        :show-file-list= "false"
+        :on-error="uploadError"
+        :on-success="uploadSuccess">
+        <el-button  type="primary" v-if="this.$store.getters.perms.indexOf('12l')>-1  || this.$store.getters.perms.indexOf('5')>-1 ">点击上传</el-button>
+        <div slot="tip" class="el-upload__tip">只能上传xls/xlsx文件(文件格式遵循导出文件)</div>
+      </el-upload>
+    </div>
     <div style="float: right; margin:20px">
-      <el-button type="primary" icon="search" @click="dialogSearchVisible=true">搜索</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">添加</el-button>
-      <el-button class="filter-item" type="primary" icon="document" @click="handleDownload">导出</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" @click="dialogMultiVisible=true" type="primary" icon="edit">批量修改</el-button>
+      <el-button type="primary" icon="search" @click="dialogSearchVisible=true" v-if="this.$store.getters.perms.indexOf('12r')>-1 || this.$store.get|| this.$store.getters.perms.indexOf('5')>-1 ">搜索</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit" v-if="this.$store.getters.perms.indexOf('12c')>-1|| this.$store.getters.perms.indexOf('5')>-1 ">添加</el-button>
+      <el-button class="filter-item" type="primary" icon="document" @click="handleDownload" v-if="this.$store.getters.perms.indexOf('12l')>-1  || this.$store.getters.perms.indexOf('5')>-1 ">导出</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" @click="dialogMultiVisible=true" type="primary" icon="edit" v-if="this.$store.getters.perms.indexOf('12e')>-1 || this.$store.getters.perms.indexOf('5')>-1 ">批量修改</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" @click="MultiDelete" type="primary"
+                 icon="edit"v-if="this.$store.getters.perms.indexOf('12d')>-1 || this.$store.getters.perms.indexOf('5')>-1">批量删除
+      </el-button>
     </div>
 
     <el-table
@@ -23,32 +37,44 @@
         <!--prop="ips_id" sortable>-->
       <!--</el-table-column>-->
       <el-table-column
-        label="网段"
-        prop="ip_segment" sortable>
+        label="老虎资产"
+        prop="vm_sn" sortable>
       </el-table-column>
       <el-table-column
-        label="掩码"
-        prop="netmask" sortable>
+        label="产商"
+        prop="oem" sortable>
       </el-table-column>
       <el-table-column
-        label="网关"
-        prop="gateway" sortable>
-      </el-table-column>
-      <el-table-column
-        label="运营商"
+        label="机房"
         prop="isp" sortable>
       </el-table-column>
       <el-table-column
-        label="城市"
-        prop="city" sortable>
+        label="机柜"
+        prop="name" sortable>
       </el-table-column>
       <el-table-column
-        label="位置"
-        prop="position" sortable>
+        label="外网地址"
+        prop="ip1" sortable>
+      </el-table-column>
+      <el-table-column
+        label="内网地址"
+        prop="ip2" sortable>
+      </el-table-column>
+      <el-table-column
+        label="宿主机资产"
+        prop="lhzq_sn" sortable>
+      </el-table-column>
+      <el-table-column
+        label="状态"
+        prop="status" sortable>
+      </el-table-column>
+      <el-table-column
+        label="配置"
+        prop="config" sortable>
       </el-table-column>
       <el-table-column
         label="修改者"
-        prop="last_editor">
+        prop="last_editor" sortable>
       </el-table-column>
       <el-table-column
         label="创建时间"
@@ -61,10 +87,10 @@
 
       <el-table-column label="操作">
         <template scope="scope">
-          <el-button
+          <el-button v-if="perms.indexOf('12u')>-1  || perms.indexOf('5')>-1 "
             size="mini"
             @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button
+          <el-button v-if="perms.indexOf('12d')>-1  || perms.indexOf('5')>-1 "
             size="mini"
             type="danger"
             @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -82,23 +108,36 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogNewVisible">
       <el-form :model="ctemp" status-icon :rules="rules" ref="ctemp" label-width="100px" class="demo-ruleForm">
 
-        <el-form-item label="ip地址段" :label-width="formLabelWidth" prop="ip_segment">
-          <el-input v-model="ctemp.ip_segment" auto-complete="off"></el-input>
+        <el-form-item label="老虎资产" :label-width="formLabelWidth" prop="lhzq_sn">
+          <el-input v-model="ctemp.vm_sn" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="掩码" :label-width="formLabelWidth" prop="netmask">
-          <el-input v-model="ctemp.netmask" auto-complete="off"></el-input>
+        <el-form-item label="厂商" :label-width="formLabelWidth" prop="oem">
+          <el-input v-model="ctemp.oem" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="网关" :label-width="formLabelWidth" prop="gateway">
-          <el-input v-model="ctemp.gateway" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="供应商" :label-width="formLabelWidth" prop="gateway">
+        <el-form-item label="机房" :label-width="formLabelWidth" prop="isp">
           <el-input v-model="ctemp.isp" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="城市" :label-width="formLabelWidth" prop="gateway" >
-          <el-input v-model="ctemp.city" auto-complete="off" ></el-input>
+        <el-form-item label="机柜" :label-width="formLabelWidth" prop="name">
+          <el-input v-model="ctemp.name" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="位置" :label-width="formLabelWidth" prop="gateway" >
-          <el-input v-model="ctemp.position" auto-complete="off" ></el-input>
+        <el-form-item label="外网地址" :label-width="formLabelWidth" prop="ip1" >
+          <el-input v-model="ctemp.ip1" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="内网地址" :label-width="formLabelWidth" prop="ip2" >
+          <el-input v-model="ctemp.ip2" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="宿主机资产" :label-width="formLabelWidth" prop="lhzq_sn">
+          <el-input v-model="ctemp.lhzq_sn" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="状态" :label-width="formLabelWidth" prop="status">
+          <el-select v-model="ctemp.status" placeholder="请选择状态">
+            <el-option label="正常" value=0></el-option>
+            <el-option label="故障" value=1></el-option>
+            <el-option label="下架" value=2></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="配置" :label-width="formLabelWidth" prop="config" >
+          <el-input v-model="ctemp.config" auto-complete="off" ></el-input>
         </el-form-item>
 
       </el-form>
@@ -111,23 +150,36 @@
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form :model="temp" status-icon :rules="rules" ref="ctemp" label-width="100px" class="demo-ruleForm">
 
-        <el-form-item label="ip地址段" :label-width="formLabelWidth" prop="ip_segment">
-          <el-input v-model="temp.ip_segment" auto-complete="off"></el-input>
+        <el-form-item label="老虎资产" :label-width="formLabelWidth" prop="lhzq_sn">
+          <el-input v-model="temp.vm_sn" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="掩码" :label-width="formLabelWidth" prop="netmask">
-          <el-input v-model="temp.netmask" auto-complete="off"></el-input>
+        <el-form-item label="厂商" :label-width="formLabelWidth" prop="oem">
+          <el-input v-model="temp.oem" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="网关" :label-width="formLabelWidth" prop="gateway">
-          <el-input v-model="temp.gateway" auto-complete="off"></el-input>
+        <el-form-item label="机房" :label-width="formLabelWidth" prop="isp">
+          <el-input v-model="temp.isp" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="供应商" :label-width="formLabelWidth" prop="gateway">
-          <el-input v-model="temp.isp" auto-complete="off" ></el-input>
+        <el-form-item label="机柜" :label-width="formLabelWidth" prop="name">
+          <el-input v-model="temp.name" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="城市" :label-width="formLabelWidth" prop="gateway">
-          <el-input v-model="temp.city" auto-complete="off" :disabled="true"></el-input>
+        <el-form-item label="外网地址" :label-width="formLabelWidth" prop="ip1" >
+          <el-input v-model="temp.ip1" auto-complete="off" ></el-input>
         </el-form-item>
-        <el-form-item label="位置" :label-width="formLabelWidth" prop="gateway">
-          <el-input v-model="temp.position" auto-complete="off" :disabled="true"></el-input>
+        <el-form-item label="内网地址" :label-width="formLabelWidth" prop="ip2" >
+          <el-input v-model="temp.ip2" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="宿主机资产" :label-width="formLabelWidth" prop="lhzq_sn">
+          <el-input v-model="temp.lhzq_sn" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="状态" :label-width="formLabelWidth" prop="status">
+          <el-select v-model="temp.status" placeholder="请选择状态">
+            <el-option label="正常" value=0></el-option>
+            <el-option label="故障" value=1></el-option>
+            <el-option label="下架" value=2></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="配置" :label-width="formLabelWidth" prop="conifg" >
+          <el-input v-model="temp.config" auto-complete="off" ></el-input>
         </el-form-item>
 
       </el-form>
@@ -139,26 +191,37 @@
     <!--批量-->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogMultiVisible">
       <el-form :model="temp" status-icon :rules="rules" ref="ctemp" label-width="100px" class="demo-ruleForm">
-
-        <el-form-item label="ip地址段" :label-width="formLabelWidth" prop="ip_segment">
-          <el-input v-model="temp.ip_segment" auto-complete="off"></el-input>
+        <el-form-item label="老虎资产" :label-width="formLabelWidth" prop="lhzq_sn">
+          <el-input v-model="temp.vm_sn" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="掩码" :label-width="formLabelWidth" prop="netmask">
-          <el-input v-model="temp.netmask" auto-complete="off"></el-input>
+        <el-form-item label="厂商" :label-width="formLabelWidth" prop="oem">
+          <el-input v-model="temp.oem" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="网关" :label-width="formLabelWidth" prop="gateway">
-          <el-input v-model="temp.gateway" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="供应商" :label-width="formLabelWidth" prop="gateway">
+        <el-form-item label="机房" :label-width="formLabelWidth" prop="isp">
           <el-input v-model="temp.isp" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="城市" :label-width="formLabelWidth" prop="gateway">
-          <el-input v-model="temp.city" auto-complete="off" :disabled="true"></el-input>
+        <el-form-item label="机柜" :label-width="formLabelWidth" prop="name">
+          <el-input v-model="temp.name" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="位置" :label-width="formLabelWidth" prop="gateway">
-          <el-input v-model="temp.position" auto-complete="off" :disabled="true"></el-input>
+        <el-form-item label="外网地址" :label-width="formLabelWidth" prop="ip1" >
+          <el-input v-model="temp.ip1" auto-complete="off" ></el-input>
         </el-form-item>
-
+        <el-form-item label="内网地址" :label-width="formLabelWidth" prop="ip2" >
+          <el-input v-model="temp.ip2" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="宿主机资产" :label-width="formLabelWidth" prop="lhzq_sn">
+          <el-input v-model="temp.lhzq_sn" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="状态" :label-width="formLabelWidth" prop="status">
+          <el-select v-model="temp.status" placeholder="请选择状态">
+            <el-option label="正常" value=0></el-option>
+            <el-option label="故障" value=1></el-option>
+            <el-option label="下架" value=2></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="配置" :label-width="formLabelWidth" prop="conifg" >
+          <el-input v-model="temp.config" auto-complete="off" ></el-input>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogMultiVisible = false">取 消</el-button>
@@ -168,23 +231,36 @@
     <!--复合搜索-->
     <el-dialog title="搜索" :visible.sync="dialogSearchVisible">
       <el-form :model="listQuery" status-icon :rules="rules" ref="ctemp" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="ip地址段" :label-width="formLabelWidth" prop="ip_segment">
-          <el-input v-model="listQuery.ip_segment" auto-complete="off"></el-input>
+        <el-form-item label="老虎资产" :label-width="formLabelWidth" prop="lhzq_sn">
+          <el-input v-model="listQuery.vm_sn" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="掩码" :label-width="formLabelWidth" prop="netmask">
-          <el-input v-model="listQuery.netmask" auto-complete="off"></el-input>
+        <el-form-item label="厂商" :label-width="formLabelWidth" prop="oem">
+          <el-input v-model="listQuery.oem" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="网关" :label-width="formLabelWidth" prop="gateway">
-          <el-input v-model="listQuery.gateway" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="供应商" :label-width="formLabelWidth" prop="gateway">
+        <el-form-item label="机房" :label-width="formLabelWidth" prop="isp">
           <el-input v-model="listQuery.isp" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="城市" :label-width="formLabelWidth" prop="gateway">
-          <el-input v-model="listQuery.city" auto-complete="off"></el-input>
+        <el-form-item label="机柜" :label-width="formLabelWidth" prop="name">
+          <el-input v-model="listQuery.name" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="位置" :label-width="formLabelWidth" prop="gateway">
-          <el-input v-model="listQuery.position" auto-complete="off"></el-input>
+        <el-form-item label="外网地址" :label-width="formLabelWidth" prop="ip1" >
+          <el-input v-model="listQuery.ip1" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="内网地址" :label-width="formLabelWidth" prop="ip2" >
+          <el-input v-model="listQuery.ip2" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="宿主机资产" :label-width="formLabelWidth" prop="lhzq_sn">
+          <el-input v-model="listQuery.lhzq_sn" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="状态" :label-width="formLabelWidth" prop="status">
+          <el-select v-model="listQuery.status" placeholder="请选择状态">
+            <el-option label="正常" value=0></el-option>
+            <el-option label="故障" value=1></el-option>
+            <el-option label="下架" value=2></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="配置" :label-width="formLabelWidth" prop="conifg" >
+          <el-input v-model="listQuery.config" auto-complete="off" ></el-input>
         </el-form-item>
 
       </el-form>
@@ -254,44 +330,53 @@
           pagesize: 20
         },
         listQuery: {
-          bandwidth: null,
-          city: null,
-          create_date: null,
-          isp: null,
-          last_editor: null,
-          line: null,
-          position: null,
-          racks: null,
-          status: null,
-          telephone: null,
+          vm_id:"",
+          lhzq_sn: "",
+          vm_sn:"",
+          oem: "",
+          isp: "",
+          name:"",
+          ip1:"",
+          ip2:"",
+          config:"",
+          status:"",
+          last_editor:"",
+          create_date:"",
+          update_date:"",
           page: 1,
           pagesize: 20
 
         },
         //edit temp
         temp: {
-          ips_id:null,
-          ip_segment: null,
-          netmask: null,
-          gateway: null,
-          isp:null,
-          city:null,
-          position:null,
+          vm_id:null,
+          lhzq_sn: null,
+          vm_sn:null,
+          oem: null,
+          isp: null,
+          name:null,
+          ip1:null,
+          ip2:null,
+          config:null,
+          status:null,
+          last_editor:null,
           create_date:null,
-          last_editor: null,
-          update_date: null,
+          update_date:null
         },
         //create temp without idc_id
         ctemp: {
-          ip_segment: null,
-          netmask: null,
-          gateway: null,
-          isp:null,
-          city:null,
-          position:null,
+          lhzq_sn: null,
+          vm_sn:null,
+          oem: null,
+          isp: null,
+          name:null,
+          ip1:null,
+          ip2:null,
+          config:null,
+          status:null,
+          last_editor:null,
           create_date:null,
-          last_editor: null,
-          update_date: null,
+          update_date:null
         },
         textMap: {
           edit: 'Edit',
@@ -324,10 +409,80 @@
       this.getList()
       console.log('geting list..')
     },
+    mounted() {
+
+      var dialog = document.querySelectorAll('div.el-dialog')
+      dialog.forEach(function (value,index,array) {
+        value.onmousedown = function(ev) {
+          var oevent = ev || event;
+
+          var distanceX = oevent.clientX - value.offsetLeft;
+          var distanceY = oevent.clientY - value.offsetTop;
+
+          document.onmousemove = function (ev) {
+            var oevent = ev || event;
+            value.style.left = oevent.clientX - distanceX -360+ 'px';
+            value.style.top = oevent.clientY - distanceY + 'px';
+          };
+          document.onmouseup = function () {
+            document.onmousemove = null;
+            document.onmouseup = null;
+          };
+        }
+      })
+
+
+    },
+    computed:{
+      filterMessage: {
+
+        get:function () {
+          return this.temp.status
+        },
+        set:function (val) {
+
+          if (val==0){
+            this.temp.status = '正常'
+          }
+          if (val==1){
+            this.temp.status ='故障'
+          }
+          if (val==2){
+            this.temp.status = '下架'
+          }
+        }
+
+
+      },
+      reverseMessage:{
+        get:function(){
+          return this.temp.status
+          console.log(this.temp.status)
+        },
+        set:function(val){
+          console.log(val)
+          if(val.indexOf('正常')>-1){
+            this.temp.status= 0
+
+          }
+          if(val.indexOf('故障')>-1){
+            this.temp.status = 1
+          }
+          if(val.indexOf('下架')>-1){
+            this.temp.status = 2
+          }
+        }
+      },
+      perms(){
+        return this.$store.getters.perms
+      }
+
+    },
+
     methods:{
       getList(){
         this.listLoading = true
-        axios.get('http://cmdb.tigerbrokers.net:8000/ips/getAll',{params:this.listQuery}).then(response=>{
+        axios.get('http://cmdb.tigerbrokers.net:8000/vms/getAllVms',{params:this.listQuery}).then(response=>{
           console.log(response.data);
           this.list = response.data.data
           console.log(response.data.total)
@@ -340,12 +495,36 @@
 
       },
       handleIconClick() {
-        this.listQuery.page=1
-        search(this.listQuery).then(response=>{
-          this.list = response.data
-        }).catch((err)=>{
+        this.dialogSearchVisible = false
+        this.listLoading =  true
+        axios.post('http://cmdb.tigerbrokers.net:8000/vms/searchVm',this.listQuery).then(response => {
+          console.log(response.data);
+          this.list = response.data.data
+          console.log(response.data.total)
+          this.total = response.data.total[0].total
+          this.listLoading = false
+          if(response.data.code=='20000'){
+            this.$notify({
+              title: '成功',
+              message: response.data.msg,
+              type: 'success',
+              duration: 5000
+            })
+          }else{
+            this.$notify({
+              title: '失败',
+              message: response.data.msg,
+              type: 'warning',
+              duration: 5000
+            })
+          }
 
+
+        }).catch((err) => {
+          console.log(err)
+          this.listLoading =  false
         })
+
 
       },
       handleSizeChange(val) {
@@ -361,29 +540,52 @@
         this.dialogStatus = 'edit'
         console.log(row)
         this.temp = Object.assign({}, row)
-        this.transferSelect.splice(0,1,row.ips_id)
-        this.temp.ips_id = this.transferSelect
-        console.log(this.$store.getters.name)
-        this.temp.last_editor = this.$store.getters.name
+        this.transferSelect.splice(0,1,row.vm_id)
+        this.temp.vm_id = this.transferSelect
+        console.log(this.$store.getters.username)
+        this.temp.last_editor = this.$store.getters.username
         this.temp.update_date = this.transferDate(date)
         console.log(this.temp)
         this.dialogFormVisible = true
       },
       handleDelete(index,row){
         console.log(row)
-        axios.post('http://cmdb.tigerbrokers.net:8000/ips/deleteIps', {ips_id: [row.ips_id]}).then(response => {
-          console.log(response.data);
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
+        const h = this.$createElement;
+        this.$msgbox({
+          title: '删除',
+          message: h('p', null, [
+            h('span', null, '删除此条记录？'),
+            h('i', { style: 'color: red' })
+          ]),
+          showCancelButton: true,
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
 
+        }).then(action => {
+          axios.post('http://cmdb.tigerbrokers.net:8000/vms/deleteVm', {vm_id: [row.vm_id]}).then(response => {
+            console.log(response.data);
+            if(response.data.code=='20000'){
+              this.$notify({
+                title: '成功',
+                message: response.data.msg,
+                type: 'success',
+                duration: 5000
+              })
+            }else{
+              this.$notify({
+                title: '失败',
+                message: response.data.msg,
+                type: 'warning',
+                duration: 5000
+              })
+            }
+            const index = this.list.indexOf(row)
+            this.list.splice(index, 1)
+          }).catch(error => {
           })
-          const index = this.list.indexOf(row)
-          this.list.splice(index, 1)
-        }).catch(error => {
-        })
+        });
+
+
       },
       handleCreate(){
         var date = new Date()
@@ -393,16 +595,16 @@
         this.ctemp.create_date = time
         this.ctemp.update_date = time
 
-        this.ctemp.last_editor = this.$store.getters.name
+        this.ctemp.last_editor = this.$store.getters.username
         console.log(this.ctemp)
       },
       handleDownload() {
         require.ensure([], () => {
           const { export_json_to_excel } = require('@/vendor/Export2Excel')
-          const tHeader = ['时间', '地区', '类型', '标题', '重要性']
-          const filterVal = ['timestamp', 'province', 'type', 'title', 'importance']
+          const tHeader = ['老虎资产', '厂商', '机房', '机柜', '外网地址','内网地址','宿主机资产','状态','配置','修改者','创建日期','更新日期']
+          const filterVal = ['vm_sn', 'oem', 'isp', 'name', 'ip1','ip2','lhzq_sn','status','config','last_editor','create_date','update_date']
           const data = this.formatJson(filterVal, this.list)
-          export_json_to_excel(tHeader, data, 'table数据')
+          export_json_to_excel(tHeader, data, '虚拟资产数据')
         })
       },
       formatJson(filterVal, jsonData) {
@@ -432,20 +634,29 @@
         this.temp = Object.assign({}, val[0])
         this.setList.forEach((item, i) => {
 
-          this.multipleSelection.push(item.ips_id);
+          this.multipleSelection.push(item.vm_id);
 
         })
       },
       update(){
-        axios.post('http://cmdb.tigerbrokers.net:8000/ips/editIps', this.temp).then(response => {
+        axios.post('http://cmdb.tigerbrokers.net:8000/vms/editVm', this.temp).then(response => {
           console.log(response)
           this.dialogFormVisible = false
-          this.$notify({
-            title: '成功',
-            message: '修改成功',
-            type: 'success',
-            duration: 2000
-          })
+          if(response.data.code=='20000'){
+            this.$notify({
+              title: '成功',
+              message: response.data.msg,
+              type: 'success',
+              duration: 5000
+            })
+          }else{
+            this.$notify({
+              title: '失败',
+              message: response.data.msg,
+              type: 'warning',
+              duration: 5000
+            })
+          }
           this.getList()
         }).catch(function (error) {
           console.log(error)
@@ -463,14 +674,23 @@
         this.temp.idc_id = this.multipleSelection
 
         console.log(this.temp)
-        axios.post('http://cmdb.tigerbrokers.net:8000/ips/editIps', this.temp).then(response => {
+        axios.post('http://cmdb.tigerbrokers.net:8000/vms/editVm', this.temp).then(response => {
           console.log(response.data);
-          this.$notify({
-            title: '成功',
-            message: '修改成功',
-            type: 'success',
-            duration: 2000
-          })
+          if(response.data.code=='20000'){
+            this.$notify({
+              title: '成功',
+              message: response.data.msg,
+              type: 'success',
+              duration: 5000
+            })
+          }else{
+            this.$notify({
+              title: '失败',
+              message: response.data.msg,
+              type: 'warning',
+              duration: 5000
+            })
+          }
           this.dialogMultiVisible = false
           this.getList()
         }).catch(error => {
@@ -482,16 +702,25 @@
         this.$refs.ctemp.validate((valid)=>{
           if(valid){
 
-            axios.post('http://cmdb.tigerbrokers.net:8000/ips/addIps', this.ctemp
+            axios.post('http://cmdb.tigerbrokers.net:8000/vms/addVm', this.ctemp
             ).then(response => {
               console.log(response)
               this.dialogNewVisible = false
-              this.$notify({
-                title: '成功',
-                message: '增加成功',
-                type: 'success',
-                duration: 2000
-              })
+              if(response.data.code=='20000'){
+                this.$notify({
+                  title: '成功',
+                  message: response.data.msg,
+                  type: 'success',
+                  duration: 5000
+                })
+              }else{
+                this.$notify({
+                  title: '失败',
+                  message: response.data.msg,
+                  type: 'warning',
+                  duration: 5000
+                })
+              }
               this.getList()
             }).catch(function (error) {
               console.log(error)
@@ -502,6 +731,63 @@
         })
 
 
+      },
+      //上传文件
+      uploadError(){
+        this.$notify({
+          title: '失败',
+          message: '上传失败',
+          type: 'warning',
+          duration: 5000
+
+        })
+      },
+      //上传成功后判断 是否录入
+      uploadSuccess(response,file,fileList) {
+
+        console.log(response)
+        if (response.code == '50000') {
+          this.$notify({
+            title: '失败',
+            message: response.msg,
+            type: 'warning',
+            duration: 5000
+
+          })
+        }
+        else {
+          this.$notify({
+            title: '成功',
+            message: response.msg,
+            type: 'success',
+            duration: 5000
+
+          })
+          this.getList()
+        }
+      },
+      //批量删除
+      MultiDelete() {
+        this.multipleSelection = []
+        this.setList.forEach((item, i) => {
+
+          this.multipleSelection.push(item.idc_id);
+
+        })
+        axios.post('http://cmdb.tigerbrokers.net:8000/vms/deleteVm', {idc_id: this.multipleSelection}).then(response => {
+          console.log(response.data);
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+
+          })
+          this.getList()
+//          const index = this.list.indexOf(row)
+//          this.list.splice(index, 1)
+        }).catch(error => {
+        })
       },
 
     }

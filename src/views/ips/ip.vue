@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
     <div style="float: right; margin:20px">
-      <el-button type="primary" icon="search" @click="dialogSearchVisible=true">搜索</el-button>
-      <el-button class="filter-item" type="primary" icon="document" @click="handleDownload">导出</el-button>
+      <el-button type="primary" icon="search" @click="dialogSearchVisible=true" v-if="this.$store.getters.perms.indexOf('32r')>-1  || this.$store.getters.perms.indexOf('5')>-1 ">搜索</el-button>
+      <el-button class="filter-item" type="primary" icon="document" @click="handleDownload" v-if="this.$store.getters.perms.indexOf('32l')>-1  || this.$store.getters.perms.indexOf('5')>-1 ">导出</el-button>
     </div>
 
     <el-table
@@ -63,7 +63,7 @@
 
       <el-table-column label="操作">
         <template scope="scope">
-          <el-button
+          <el-button v-if="perms.indexOf('32u')>-1 || perms.indexOf('5')>-1 "
             size="mini"
             @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 
@@ -217,7 +217,7 @@
         total: null,
         listLoading: true,
         listQuery: {
-          ip_id:"",
+
           status:"",
           city:"",
           create_date:"",
@@ -277,6 +277,30 @@
       this.getList()
       console.log('geting list..')
     },
+    mounted() {
+
+      var dialog = document.querySelectorAll('div.el-dialog')
+      dialog.forEach(function (value,index,array) {
+        value.onmousedown = function(ev) {
+          var oevent = ev || event;
+
+          var distanceX = oevent.clientX - value.offsetLeft;
+          var distanceY = oevent.clientY - value.offsetTop;
+
+          document.onmousemove = function (ev) {
+            var oevent = ev || event;
+            value.style.left = oevent.clientX - distanceX-360 + 'px';
+            value.style.top = oevent.clientY - distanceY + 'px';
+          };
+          document.onmouseup = function () {
+            document.onmousemove = null;
+            document.onmouseup = null;
+          };
+        }
+      })
+
+
+    },
     computed:{
       filterMessage: {
 
@@ -297,6 +321,28 @@
         }
 
 
+      },
+      reverseMessage:{
+        get:function(){
+          return this.temp.status
+          console.log(this.temp.status)
+        },
+        set:function(val){
+          console.log(val)
+          if(val.indexOf('已分配')>-1){
+            this.temp.status= 0
+            console.log(11111)
+          }
+          if(val.indexOf('系统占用')>-1){
+            this.temp.status = 1
+          }
+          if(val.indexOf('未占用')>-1){
+            this.temp.status = 2
+          }
+        }
+      },
+      perms(){
+        return this.$store.getters.perms
       }
     },
     methods:{
@@ -323,7 +369,22 @@
           console.log(response.data.total)
           this.total = response.data.total[0].total
           this.listLoading = false
-
+          if(response.data.code=='20000'){
+            this.$notify({
+              title: '成功',
+              message: response.data.msg,
+              type: 'success',
+              duration: 5000
+            })
+          }else{
+            this.$notify({
+              title: '失败',
+              message: response.data.msg,
+              type: 'warning',
+              duration: 5000
+            })
+          }
+          this.$refs.listQuery.resetFields()
         }).catch((err) => {
           console.log(err)
           this.listLoading =  false
@@ -349,7 +410,7 @@
         this.temp.ip_id = this.transferSelect
 
 
-        this.temp.last_editor = this.$store.getters.name
+        this.temp.last_editor = this.$store.getters.username
         this.temp.update_date = date
         console.log(this.temp.status)
         console.log(this.filterMessage)
@@ -374,8 +435,8 @@
       handleDownload() {
         require.ensure([], () => {
           const { export_json_to_excel } = require('@/vendor/Export2Excel')
-          const tHeader = ['IP', '掩码', '网关','运营商','城市','位置','修改者','创建日期','更新日期']
-          const filterVal = ['ip', 'netmask', 'gateway', 'isp', 'city','position','last_editor','create_date','update_date']
+          const tHeader = ['IP', '掩码', '网关','运营商','城市','位置','状态','修改者','创建日期','更新日期']
+          const filterVal = ['ip', 'netmask', 'gateway', 'isp', 'city','position','status','last_editor','create_date','update_date']
           const data = this.formatJson(filterVal, this.list)
           export_json_to_excel(tHeader, data, 'ip数据')
         })
@@ -390,15 +451,25 @@
         }))
       },
       update() {
+        this.reverseMessage=this.temp.status
         axios.post('http://cmdb.tigerbrokers.net:8000/ip/editIp', this.temp).then(response => {
           console.log(response)
           this.dialogFormVisible = false
-          this.$notify({
-            title: '成功',
-            message: '修改成功',
-            type: 'success',
-            duration: 2000
-          })
+          if(response.data.code=='20000'){
+            this.$notify({
+              title: '成功',
+              message: response.data.msg,
+              type: 'success',
+              duration: 5000
+            })
+          }else{
+            this.$notify({
+              title: '失败',
+              message: response.data.msg,
+              type: 'warning',
+              duration: 5000
+            })
+          }
           this.getList()
         }).catch(function (error) {
           console.log(error)

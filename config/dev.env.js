@@ -3,5 +3,5 @@ var prodEnv = require('./prod.env')
 
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
-  BASE_API: '"http://172.25.53.176:3000"',
+  BASE_API: '"http://cmdb.tigerbrokers.net:8000"',
 })

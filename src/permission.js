@@ -11,10 +11,10 @@ router.beforeEach((to, from, next) => {
     if (to.path === '/login') {
       next({ path: '/' })
     } else {
-      if (store.getters.roles.length === 0) {
+      if (store.getters.perms.length === 0) {
         store.dispatch('GetInfo').then(res => {
-          const roles = res.data.role
-          store.dispatch('GenerateRoutes', { roles }).then(() => {
+          const perms = res.data.perms
+          store.dispatch('GenerateRoutes', { perms }).then(() => {
             router.addRoutes(store.getters.addRouters)
             next({ ...to })
           })

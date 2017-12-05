@@ -1,10 +1,24 @@
 <template>
   <div class="app-container">
+    <div style="float: left; margin: 20px;" >
+      <el-upload
+        class="upload-demo"
+        action="http://cmdb.tigerbrokers.net:8000/devices/uploadDevice"
+        :show-file-list= "false"
+        :on-error="uploadError"
+        :on-success="uploadSuccess">
+        <el-button  type="primary" v-if="this.$store.getters.perms.indexOf('11l')>-1 ||  this.$store.getters.perms.indexOf('5')>-1 ">点击上传</el-button>
+        <div slot="tip" class="el-upload__tip">只能上传xls/xlsx文件(文件格式遵循导出文件)</div>
+      </el-upload>
+    </div>
     <div style="float: right; margin:20px">
-      <el-button type="primary" icon="search" @click="dialogSearchVisible=true">搜索</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit">添加</el-button>
-      <el-button class="filter-item" type="primary" icon="document" @click="handleDownload">导出</el-button>
-      <el-button class="filter-item" style="margin-left: 10px;" @click="dialogMultiVisible=true" type="primary" icon="edit">批量修改</el-button>
+      <el-button type="primary" icon="search" @click="dialogSearchVisible=true" v-if="this.$store.getters.perms.indexOf('11r')>-1||  this.$store.getters.perms.indexOf('5')>-1 ">搜索</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="edit" v-if="this.$store.getters.perms.indexOf('11c')>-1|| this.$store.getters.perms.indexOf('5')>-1 ">添加</el-button>
+      <el-button class="filter-item" type="primary" icon="document" @click="handleDownload" v-if="this.$store.getters.perms.indexOf('11l')>-1|| this.$store.getters.perms.indexOf('5')>-1 ">导出</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" @click="dialogMultiVisible=true" type="primary" icon="edit" v-if="this.$store.getters.perms.indexOf('11u')>-1|| this.$store.getters.perms.indexOf('5')>-1 ">批量修改</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" @click="MultiDelete" type="primary"
+                 icon="edit"v-if="this.$store.getters.perms.indexOf('11d')>-1 || this.$store.getters.perms.indexOf('5')>-1">批量删除
+      </el-button>
     </div>
 
     <el-table
@@ -17,11 +31,14 @@
       <el-table-column type="expand">
         <template scope="scope">
           <el-form label-position="left" inline class="demo-table-expand">
-            <el-form-item label="配置">
-              <span>{{ scope.row.config }}</span>
+            <el-form-item label="服务码">
+              <span>{{ scope.row.code }}</span>
             </el-form-item>
-            <el-form-item label="购买时间">
-              <span>{{ scope.row.buy_time }}</span>
+            <el-form-item label="城市">
+              <span>{{ scope.row.city }}</span>
+            </el-form-item>
+            <el-form-item label="位置">
+              <span>{{ scope.row.position }}</span>
             </el-form-item>
             <el-form-item label="续保时间">
               <span>{{ scope.row.Renewal_first }}</span>
@@ -54,73 +71,67 @@
         label="SN"
         prop="sn" sortable>
       </el-table-column>
-      <el-table-column
-        label="服务码"
-        prop="code" sortable>
-      </el-table-column>
+
       <el-table-column
         label="老虎资产"
         prop="lhzq_sn" sortable>
-      </el-table-column>
-      <el-table-column
-        label="设备类别"
-        prop="asset_type" sortable>
       </el-table-column>
       <el-table-column
         label="厂商"
         prop="oem" sortable>
       </el-table-column>
       <el-table-column
+        label="设备类别"
+        prop="asset_type" sortable>
+      </el-table-column>
+
+      <el-table-column
         label="型号"
         prop="model" sortable>
       </el-table-column>
       <el-table-column
         label="机房"
-        prop="isp">
+        prop="isp" sortable>
       </el-table-column>
-      <el-table-column
-        label="城市"
-        prop="city">
-      </el-table-column>
-      <el-table-column
-        label="位置"
-        prop="position">
-      </el-table-column>
-
       <el-table-column
         label="机柜"
-        prop="name">
+        prop="name" sortable>
       </el-table-column>
-
       <el-table-column
         label="外网地址"
-        prop="ip1">
+        prop="ip1" sortable>
       </el-table-column>
 
       <el-table-column
         label="内网地址"
-        prop="ip2">
+        prop="ip2" sortable>
       </el-table-column>
 
       <el-table-column
         label="管理地址"
-        prop="ip3">
+        prop="ip3" sortable>
       </el-table-column>
 
       <el-table-column
         label="状态"
-        prop="status">
+        prop="status" sortable>
         <template scope="scope">
           {{scope.row.status | deviceV }}
         </template>
       </el-table-column>
+      <el-table-column
+        label="购买时间"
+        prop="buy_time">
+      </el-table-column>
+
+
 
       <el-table-column label="操作">
         <template scope="scope">
-          <el-button
+          <el-button v-if="perms.indexOf('11u')>-1|| perms.indexOf('5')>-1 "
             size="mini"
             @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button
+          <el-button v-if="perms.indexOf('11d')>-1||perms.indexOf('5')>-1 "
             size="mini"
             type="danger"
             @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -136,7 +147,7 @@
 
     <!--新增-->
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogNewVisible">
-      <el-form :model="ctemp" status-icon :rules="rules" ref="temp" label-width="100px" class="demo-ruleForm">
+      <el-form :model="ctemp" status-icon :rules="rules" ref="ctemp" label-width="100px" class="demo-ruleForm">
 
         <el-form-item label="SN" :label-width="formLabelWidth" prop="sn">
           <el-input v-model="ctemp.sn" auto-complete="off"></el-input>
@@ -147,7 +158,14 @@
         <el-form-item label="老虎资产" :label-width="formLabelWidth" prop="lhza_sn">
           <el-input v-model="ctemp.lhzq_sn" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="设备类型" :label-width="formLabelWidth" prop="asset_type">
+        <el-form-item label="设备类别" :label-width="formLabelWidth" prop="asset_type">
+          <el-select v-model="ctemp.asset_type" placeholder="请选择状态">
+            <el-option label="服务器" value="服务器"></el-option>
+            <el-option label="交换机" value="交换机"></el-option>
+            <el-option label="防火墙" value="防火墙"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="设备类别" :label-width="formLabelWidth" prop="asset_type">
           <el-input v-model="ctemp.asset_type" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="厂商" :label-width="formLabelWidth" prop="oem" >
@@ -179,13 +197,13 @@
           </el-select>
         </el-form-item>
         <el-form-item label="配置" :label-width="formLabelWidth" prop="config" >
-          <el-input v-model="temp.config" auto-complete="off" ></el-input>
+          <el-input v-model="ctemp.config" auto-complete="off" ></el-input>
         </el-form-item>
         <el-form-item label="购买时间" :label-width="formLabelWidth" prop="buy_time" >
-          <el-input v-model="temp.buy_time" auto-complete="off" ></el-input>
+          <el-input v-model="ctemp.buy_time" auto-complete="off" ></el-input>
         </el-form-item>
         <el-form-item label="续保时间" :label-width="formLabelWidth" prop="Renewal_first" >
-          <el-input v-model="temp.Renewal_first" auto-complete="off" ></el-input>
+          <el-input v-model="ctemp.Renewal_first" auto-complete="off" ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -206,8 +224,12 @@
         <el-form-item label="老虎资产" :label-width="formLabelWidth" prop="lhza_sn">
           <el-input v-model="temp.lhzq_sn" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="设备类型" :label-width="formLabelWidth" prop="asset_type">
-          <el-input v-model="temp.asset_type" auto-complete="off"></el-input>
+        <el-form-item label="设备类别" :label-width="formLabelWidth" prop="asset_type">
+          <el-select v-model="temp.asset_type" placeholder="请选择状态">
+            <el-option label="服务器" value="服务器"></el-option>
+            <el-option label="交换机" value="交换机"></el-option>
+            <el-option label="防火墙" value="防火墙"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="厂商" :label-width="formLabelWidth" prop="oem" >
           <el-input v-model="temp.oem" auto-complete="off" ></el-input>
@@ -265,8 +287,12 @@
         <el-form-item label="老虎资产" :label-width="formLabelWidth" prop="lhza_sn">
           <el-input v-model="temp.lhzq_sn" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="设备类型" :label-width="formLabelWidth" prop="asset_type">
-          <el-input v-model="temp.asset_type" auto-complete="off"></el-input>
+        <el-form-item label="设备类别" :label-width="formLabelWidth" prop="asset_type">
+          <el-select v-model="temp.asset_type" placeholder="请选择状态">
+            <el-option label="服务器" value="服务器"></el-option>
+            <el-option label="交换机" value="交换机"></el-option>
+            <el-option label="防火墙" value="防火墙"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="厂商" :label-width="formLabelWidth" prop="oem" >
           <el-input v-model="temp.oem" auto-complete="off" ></el-input>
@@ -313,28 +339,36 @@
     </el-dialog>
     <!--复合搜索-->
     <el-dialog title="搜索" :visible.sync="dialogSearchVisible">
-      <el-form :model="listQuery" status-icon :rules="rules" ref="listQuery" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="城市" :label-width="formLabelWidth" prop="city">
-        <el-input v-model="listQuery.city" auto-complete="off"></el-input>
-      </el-form-item>
+
+
+      <el-form :model="listQuery" status-icon  ref="listQuery" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="SN" :label-width="formLabelWidth" prop="sn">
+          <el-input v-model="listQuery.sn" auto-complete="off"></el-input>
+        </el-form-item>
         <el-form-item label="服务码" :label-width="formLabelWidth" prop="code">
           <el-input v-model="listQuery.code" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="续保时间" :label-width="formLabelWidth" prop="Renewal_first">
-          <el-input v-model="listQuery.Renewal_first" auto-complete="off"></el-input>
+        <el-form-item label="老虎资产" :label-width="formLabelWidth" prop="lhza_sn">
+          <el-input v-model="listQuery.lhzq_sn" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="续保过期" :label-width="formLabelWidth" prop="Renewal_expiration">
-          <el-input v-model="listQuery.Renewal_expiration" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="配置" :label-width="formLabelWidth" prop="config" >
-          <el-input v-model="listQuery.config" auto-complete="off" ></el-input>
-        </el-form-item>
-        <el-form-item label="状态" :label-width="formLabelWidth" prop="status">
-          <el-select v-model="listQuery.status" placeholder="请选择状态">
-            <el-option label="正常" value=0></el-option>
-            <el-option label="故障" value=1></el-option>
-            <el-option label="下架" value=2></el-option>
+        <el-form-item label="设备类别" :label-width="formLabelWidth" prop="asset_type">
+          <el-select v-model="listQuery.asset_type" placeholder="请选择状态">
+            <el-option label="服务器" value="服务器"></el-option>
+            <el-option label="交换机" value="交换机"></el-option>
+            <el-option label="防火墙" value="防火墙"></el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="厂商" :label-width="formLabelWidth" prop="oem" >
+          <el-input v-model="listQuery.oem" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="型号" :label-width="formLabelWidth" prop="model" >
+          <el-input v-model="listQuery.model" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="机房" :label-width="formLabelWidth" prop="isp" >
+          <el-input v-model="listQuery.isp" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="机柜" :label-width="formLabelWidth" prop="name" >
+          <el-input v-model="listQuery.name" auto-complete="off" ></el-input>
         </el-form-item>
         <el-form-item label="外网地址" :label-width="formLabelWidth" prop="ip1" >
           <el-input v-model="listQuery.ip1" auto-complete="off" ></el-input>
@@ -345,8 +379,21 @@
         <el-form-item label="管理地址" :label-width="formLabelWidth" prop="ip3" >
           <el-input v-model="listQuery.ip3" auto-complete="off" ></el-input>
         </el-form-item>
-        <el-form-item label="厂商" :label-width="formLabelWidth" prop="oem" >
-          <el-input v-model="listQuery.oem" auto-complete="off" ></el-input>
+        <el-form-item label="状态" :label-width="formLabelWidth" prop="status">
+          <el-select v-model="listQuery.status" placeholder="请选择状态">
+            <el-option label="正常" value=0></el-option>
+            <el-option label="故障" value=1></el-option>
+            <el-option label="下架" value=2></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="配置" :label-width="formLabelWidth" prop="config" >
+          <el-input v-model="listQuery.config" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="购买时间" :label-width="formLabelWidth" prop="buy_time" >
+          <el-input v-model="listQuery.buy_time" auto-complete="off" ></el-input>
+        </el-form-item>
+        <el-form-item label="续保时间" :label-width="formLabelWidth" prop="Renewal_first" >
+          <el-input v-model="listQuery.Renewal_first" auto-complete="off" ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -416,29 +463,29 @@
           pagesize: 20
         },
         listQuery: {
-          code: null,
-          city: null,
-          create_date: null,
-          Renewal_first:null,
-          Renewal_expiration:null,
-          expiration_time:null,
-          config:null,
-          status:null,
-          update_date:null,
-          ip2:null,
-          ip1:null,
-          ip3:null,
-          oem:null,
-          last_editor:null,
-          asset_type:null,
-          device_id:null,
-          name:null,
-          buy_time:null,
-          isp:null,
-          lhzq_sn:null,
-          sn:null,
-          position:null,
-          model:null,
+          code: "",
+          city: "",
+          create_date: "",
+          Renewal_first:"",
+          Renewal_expiration:"",
+          expiration_time:"",
+          config:"",
+          status:"",
+          update_date:"",
+          ip2:"",
+          ip1:"",
+          ip3:"",
+          oem:"",
+          last_editor:"",
+          asset_type:"",
+          device_id:"",
+          name:"",
+          buy_time:"",
+          isp:"",
+          lhzq_sn:"",
+          sn:"",
+          position:"",
+          model:"",
           page: 1,
           pagesize: 20
 
@@ -526,6 +573,30 @@
       this.getList()
       console.log('geting list..')
     },
+    mounted() {
+
+      var dialog = document.querySelectorAll('div.el-dialog')
+      dialog.forEach(function (value,index,array) {
+        value.onmousedown = function(ev) {
+          var oevent = ev || event;
+
+          var distanceX = oevent.clientX - value.offsetLeft;
+          var distanceY = oevent.clientY - value.offsetTop;
+
+          document.onmousemove = function (ev) {
+            var oevent = ev || event;
+            value.style.left = oevent.clientX - distanceX -360+ 'px';
+            value.style.top = oevent.clientY - distanceY + 'px';
+          };
+          document.onmouseup = function () {
+            document.onmousemove = null;
+            document.onmouseup = null;
+          };
+        }
+      })
+
+
+    },
     computed:{
       filterMessage: {
 
@@ -546,7 +617,30 @@
         }
 
 
+      },
+      reverseMessage:{
+        get:function(){
+          return this.temp.status
+          console.log(this.temp.status)
+        },
+        set:function(val){
+          console.log(val)
+          if(val.indexOf('正常')>-1){
+            this.temp.status= 0
+
+          }
+          if(val.indexOf('故障')>-1){
+            this.temp.status = 1
+          }
+          if(val.indexOf('下架')>-1){
+            this.temp.status = 2
+          }
+        }
+      },
+      perms(){
+        return this.$store.getters.perms
       }
+
     },
     methods:{
       getList(){
@@ -564,12 +658,36 @@
 
       },
       handleIconClick() {
-        this.listQuery.page=1
-        search(this.listQuery).then(response=>{
-          this.list = response.data
-        }).catch((err)=>{
+        this.dialogSearchVisible = false
+        this.listLoading =  true
+        axios.post('http://cmdb.tigerbrokers.net:8000/devices/searchDevice',this.listQuery).then(response => {
+          console.log(response.data);
+          this.list = response.data.data
+          console.log(response.data.total)
+          this.total = response.data.total[0].total
+          this.listLoading = false
+          if(response.data.code=='20000'){
+            this.$notify({
+              title: '成功',
+              message: response.data.msg,
+              type: 'success',
+              duration: 5000
+            })
+          }else{
+            this.$notify({
+              title: '失败',
+              message: response.data.msg,
+              type: 'warning',
+              duration: 5000
+            })
+          }
 
+
+        }).catch((err) => {
+          console.log(err)
+          this.listLoading =  false
         })
+
 
       },
       handleSizeChange(val) {
@@ -588,27 +706,50 @@
         this.filterMessage = this.temp.status
         this.transferSelect.splice(0,1,row.device_id)
         this.temp.device_id = this.transferSelect
-        console.log(this.$store.getters.name)
-        this.temp.last_editor = this.$store.getters.name
+        console.log(this.$store.getters.username)
+        this.temp.last_editor = this.$store.getters.username
         this.temp.update_date = this.transferDate(date)
         console.log(this.temp)
         this.dialogFormVisible = true
       },
       handleDelete(index,row){
         console.log(row)
-        axios.post('http://cmdb.tigerbrokers.net:8000/devices/deleteDevice', {device_id: [row.device_id]}).then(response => {
-          console.log(response.data);
-          this.$notify({
-            title: '成功',
-            message: '删除成功',
-            type: 'success',
-            duration: 2000
+        const h = this.$createElement;
+        this.$msgbox({
+          title: '删除',
+          message: h('p', null, [
+            h('span', null, '删除此条记录？'),
+            h('i', { style: 'color: red' })
+          ]),
+          showCancelButton: true,
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
 
+        }).then(action => {
+          axios.post('http://cmdb.tigerbrokers.net:8000/devices/deleteDevice', {device_id: [row.device_id]}).then(response => {
+            console.log(response.data);
+            if(response.data.code=='20000'){
+              this.$notify({
+                title: '成功',
+                message: response.data.msg,
+                type: 'success',
+                duration: 5000
+              })
+            }else{
+              this.$notify({
+                title: '失败',
+                message: response.data.msg,
+                type: 'warning',
+                duration: 5000
+              })
+            }
+            const index = this.list.indexOf(row)
+            this.list.splice(index, 1)
+          }).catch(error => {
           })
-          const index = this.list.indexOf(row)
-          this.list.splice(index, 1)
-        }).catch(error => {
-        })
+        });
+
+
       },
       handleCreate(){
         var date = new Date()
@@ -618,16 +759,16 @@
         this.ctemp.create_date = time
         this.ctemp.update_date = time
 
-        this.ctemp.last_editor = this.$store.getters.name
+        this.ctemp.last_editor = this.$store.getters.username
         console.log(this.ctemp)
       },
       handleDownload() {
         require.ensure([], () => {
           const { export_json_to_excel } = require('@/vendor/Export2Excel')
-          const tHeader = ['时间', '地区', '类型', '标题', '重要性']
-          const filterVal = ['timestamp', 'province', 'type', 'title', 'importance']
+          const tHeader = ['SN', '服务码', '老虎资产', '设备类别', '厂商','型号','机房','城市','位置','机柜','外网地址','内网地址','管理地址','状态','配置','购买时间','续保时间','续保过期','修改者','创建日期','更新日期']
+          const filterVal = ['sn', 'code', 'lhzq_sn', 'asset_type', 'oem','model','isp','city','position','name','ip1','ip2','ip3','status','config','buy_time','Renewal_first','Renewal_expiration','last_editor','create_date','update_date']
           const data = this.formatJson(filterVal, this.list)
-          export_json_to_excel(tHeader, data, 'table数据')
+          export_json_to_excel(tHeader, data, '物理资产数据')
         })
       },
       formatJson(filterVal, jsonData) {
@@ -662,15 +803,25 @@
         })
       },
       update(){
+        this.reverseMessage=this.temp.status
         axios.post('http://cmdb.tigerbrokers.net:8000/devices/editDevice', this.temp).then(response => {
           console.log(response)
           this.dialogFormVisible = false
-          this.$notify({
-            title: '成功',
-            message: '修改成功',
-            type: 'success',
-            duration: 2000
-          })
+          if(response.data.code=='20000'){
+            this.$notify({
+              title: '成功',
+              message: response.data.msg,
+              type: 'success',
+              duration: 5000
+            })
+          }else{
+            this.$notify({
+              title: '失败',
+              message: response.data.msg,
+              type: 'warning',
+              duration: 5000
+            })
+          }
           this.getList()
         }).catch(function (error) {
           console.log(error)
@@ -686,7 +837,7 @@
 
         this.temp.update_date = this.transferDate(date)
         this.temp.idc_id = this.multipleSelection
-
+        this.reverseMessage=this.temp.status
         console.log(this.temp)
         axios.post('http://cmdb.tigerbrokers.net:8000/devices/editDevices', this.temp).then(response => {
           console.log(response.data);
@@ -711,12 +862,21 @@
             ).then(response => {
               console.log(response)
               this.dialogNewVisible = false
-              this.$notify({
-                title: '成功',
-                message: '增加成功',
-                type: 'success',
-                duration: 2000
-              })
+              if(response.data.code=='20000'){
+                this.$notify({
+                  title: '成功',
+                  message: response.data.msg,
+                  type: 'success',
+                  duration: 5000
+                })
+              }else{
+                this.$notify({
+                  title: '失败',
+                  message: response.data.msg,
+                  type: 'warning',
+                  duration: 5000
+                })
+              }
               this.getList()
             }).catch(function (error) {
               console.log(error)
@@ -727,6 +887,63 @@
         })
 
 
+      },
+      //上传文件
+      uploadError(){
+        this.$notify({
+          title: '失败',
+          message: '上传失败',
+          type: 'warning',
+          duration: 5000
+
+        })
+      },
+      //上传成功后判断 是否录入
+      uploadSuccess(response,file,fileList) {
+
+        console.log(response)
+        if (response.code == '50000') {
+          this.$notify({
+            title: '失败',
+            message: response.msg,
+            type: 'warning',
+            duration: 5000
+
+          })
+        }
+        else {
+          this.$notify({
+            title: '成功',
+            message: response.msg,
+            type: 'success',
+            duration: 5000
+
+          })
+          this.getList()
+        }
+      },
+      //批量删除
+      MultiDelete() {
+        this.multipleSelection = []
+        this.setList.forEach((item, i) => {
+
+          this.multipleSelection.push(item.idc_id);
+
+        })
+        axios.post('http://cmdb.tigerbrokers.net:8000/devices/deleteDevice', {idc_id: this.multipleSelection}).then(response => {
+          console.log(response.data);
+          this.$notify({
+            title: '成功',
+            message: '删除成功',
+            type: 'success',
+            duration: 2000
+
+          })
+          this.getList()
+//          const index = this.list.indexOf(row)
+//          this.list.splice(index, 1)
+        }).catch(error => {
+        })
       },
 
     }
