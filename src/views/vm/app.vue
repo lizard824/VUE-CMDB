@@ -752,11 +752,41 @@
       },
       handleSizeChange(val) {
         this.listQuery.pagesize = val
-        this.getList()
+        if(Object.keys(this.listQuery).length>2){
+          axios.post('http://cmdb.tigerbrokers.net:8000/apps/searchApp',this.listQuery).then(response => {
+            console.log(response.data);
+            this.list = response.data.data
+            console.log(response.data.total)
+            this.total = response.data.total[0].total
+            this.listLoading = false
+
+
+          }).catch((err) => {
+            console.log(err)
+            this.listLoading =  false
+          })
+        }else {
+          this.getList()
+        }
       },
       handleCurrentChange(val) {
         this.listQuery.page = val
-        this.getList()
+        if(Object.keys(this.listQuery).length>2){
+          axios.post('http://cmdb.tigerbrokers.net:8000/apps/searchApp',this.listQuery).then(response => {
+            console.log(response.data);
+            this.list = response.data.data
+            console.log(response.data.total)
+            this.total = response.data.total[0].total
+            this.listLoading = false
+
+
+          }).catch((err) => {
+            console.log(err)
+            this.listLoading =  false
+          })
+        }else {
+          this.getList()
+        }
       },
       handleEdit(index,row){
         var date = new Date()
@@ -896,7 +926,7 @@
         this.dialogMultiVisible = true
 
         this.temp.update_date = this.transferDate(date)
-        this.temp.idc_id = this.multipleSelection
+        this.temp.id = this.multipleSelection
         this.reverseMessage=this.temp.flag
         console.log(this.temp)
         axios.post('http://cmdb.tigerbrokers.net:8000/apps/editApp', this.temp).then(response => {
@@ -996,10 +1026,10 @@
         this.multipleSelection = []
         this.setList.forEach((item, i) => {
 
-          this.multipleSelection.push(item.idc_id);
+          this.multipleSelection.push(item.id);
 
         })
-        axios.post('http://cmdb.tigerbrokers.net:8000/apps/deleteApp', {idc_id: this.multipleSelection}).then(response => {
+        axios.post('http://cmdb.tigerbrokers.net:8000/apps/deleteApp', {id: this.multipleSelection}).then(response => {
           console.log(response.data);
           this.$notify({
             title: '成功',

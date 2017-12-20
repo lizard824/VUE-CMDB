@@ -545,7 +545,7 @@
         this.dialogMultiVisible = true
 
         this.temp.update_date = this.transferDate(date)
-        this.temp.idc_id = this.multipleSelection
+        this.temp.ips_id = this.multipleSelection
 
         console.log(this.temp)
         axios.post('http://cmdb.tigerbrokers.net:8000/ips/editIps', this.temp).then(response => {
@@ -645,10 +645,10 @@
         this.multipleSelection = []
         this.setList.forEach((item, i) => {
 
-          this.multipleSelection.push(item.idc_id);
+          this.multipleSelection.push(item.ips_id);
 
         })
-        axios.post('http://cmdb.tigerbrokers.net:8000/ips/deleteIps', {idc_id: this.multipleSelection}).then(response => {
+        axios.post('http://cmdb.tigerbrokers.net:8000/ips/deleteIps', {ips_id: this.multipleSelection}).then(response => {
           console.log(response.data);
           this.$notify({
             title: '成功',

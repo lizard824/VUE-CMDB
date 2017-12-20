@@ -12,7 +12,7 @@
         </template>
         <template v-for="child in item.children" v-if='!child.hidden'>
           <sidebar-item class='menu-indent' v-if='child.children&&child.children.length>0' :routes='[child]'> </sidebar-item>
-          <router-link v-else class="menu-indent" :to="item.path+'/'+child.path" @click.native="click(child.path)">
+          <router-link v-else class="menu-indent" :to="item.path+'/'+child.path" >
             <el-menu-item :index="item.path+'/'+child.path">
               {{child.name}}
             </el-menu-item>
@@ -29,18 +29,6 @@ export default {
   props: {
     routes: {
       type: Array
-    }
-  },
-  methods:{
-    click: function (path) {
-
-//      this.$router.go(0)
-      this.$router.push({
-        path,
-        query:{
-          t: +new Date()
-        }
-      })
     }
   }
 

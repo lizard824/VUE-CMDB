@@ -67,6 +67,9 @@
       <el-table-column
         label="状态"
         prop="status" sortable>
+        <template scope="scope">
+          {{scope.row.status | deviceV }}
+        </template>
       </el-table-column>
       <el-table-column
         label="配置"
@@ -529,17 +532,48 @@
       },
       handleSizeChange(val) {
         this.listQuery.pagesize = val
-        this.getList()
+        if(Object.keys(this.listQuery).length>2){
+          axios.post('http://cmdb.tigerbrokers.net:8000/vms/searchVm',this.listQuery).then(response => {
+            console.log(response.data);
+            this.list = response.data.data
+            console.log(response.data.total)
+            this.total = response.data.total[0].total
+            this.listLoading = false
+
+
+          }).catch((err) => {
+            console.log(err)
+            this.listLoading =  false
+          })
+        }else {
+          this.getList()
+        }
       },
       handleCurrentChange(val) {
         this.listQuery.page = val
-        this.getList()
+        if(Object.keys(this.listQuery).length>2){
+          axios.post('http://cmdb.tigerbrokers.net:8000/vms/searchVm',this.listQuery).then(response => {
+            console.log(response.data);
+            this.list = response.data.data
+            console.log(response.data.total)
+            this.total = response.data.total[0].total
+            this.listLoading = false
+
+
+          }).catch((err) => {
+            console.log(err)
+            this.listLoading =  false
+          })
+        }else {
+          this.getList()
+        }
       },
       handleEdit(index,row){
         var date = new Date()
         this.dialogStatus = 'edit'
         console.log(row)
         this.temp = Object.assign({}, row)
+        this.filterMessage = this.temp.status
         this.transferSelect.splice(0,1,row.vm_id)
         this.temp.vm_id = this.transferSelect
         console.log(this.$store.getters.username)
@@ -639,6 +673,7 @@
         })
       },
       update(){
+        this.reverseMessage=this.temp.status
         axios.post('http://cmdb.tigerbrokers.net:8000/vms/editVm', this.temp).then(response => {
           console.log(response)
           this.dialogFormVisible = false
@@ -671,8 +706,8 @@
         this.dialogMultiVisible = true
 
         this.temp.update_date = this.transferDate(date)
-        this.temp.idc_id = this.multipleSelection
-
+        this.temp.vm_id = this.multipleSelection
+        this.reverseMessage=this.temp.status
         console.log(this.temp)
         axios.post('http://cmdb.tigerbrokers.net:8000/vms/editVm', this.temp).then(response => {
           console.log(response.data);
@@ -771,10 +806,10 @@
         this.multipleSelection = []
         this.setList.forEach((item, i) => {
 
-          this.multipleSelection.push(item.idc_id);
+          this.multipleSelection.push(item.vm_id);
 
         })
-        axios.post('http://cmdb.tigerbrokers.net:8000/vms/deleteVm', {idc_id: this.multipleSelection}).then(response => {
+        axios.post('http://cmdb.tigerbrokers.net:8000/vms/deleteVm', {vm_id: this.multipleSelection}).then(response => {
           console.log(response.data);
           this.$notify({
             title: '成功',
