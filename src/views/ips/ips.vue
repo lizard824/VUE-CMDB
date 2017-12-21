@@ -262,6 +262,7 @@
         formLabelWidth: '120px',
         list: null,
         total: null,
+        row:null,
         listLoading: true,
         defalutQuery:{
           page: 1,
@@ -350,7 +351,7 @@
 
           document.onmousemove = function (ev) {
             var oevent = ev || event;
-            value.style.left = oevent.clientX - distanceX -360+ 'px';
+            value.style.left = oevent.clientX - distanceX + 'px';
             value.style.top = oevent.clientY - distanceY + 'px';
           };
           document.onmouseup = function () {
@@ -436,6 +437,7 @@
         this.temp.update_date = this.transferDate(date)
         console.log(this.temp)
         this.dialogFormVisible = true
+        this.row = row
       },
       handleDelete(index,row){
         console.log(row)
@@ -531,7 +533,9 @@
               duration: 5000
             })
           }
-          this.getList()
+          const index = this.list.indexOf(this.row)
+          console.log(index,this.list, this.temp,this.row)
+          this.list.splice(index,1,this.temp)
         }).catch(function (error) {
           console.log(error)
         })

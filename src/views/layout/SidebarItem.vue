@@ -1,7 +1,7 @@
 <template>
   <div>
     <template v-for="item in routes">
-      <router-link v-if="!item.hidden&&item.noDropdown&&item.children.length>0" :to="item.path+'/'+item.children[0].path" @click.native="click">
+      <router-link v-if="!item.hidden&&item.noDropdown&&item.children.length>0" :to="item.path+'/'+item.children[0].path" >
         <el-menu-item :index="item.path+'/'+item.children[0].path">
           <icon-svg v-if='item.icon' :icon-class="item.icon" /> {{item.children[0].name}}
         </el-menu-item>

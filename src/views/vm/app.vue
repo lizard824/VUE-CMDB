@@ -130,7 +130,7 @@
 
       <el-table-column label="操作">
         <template scope="scope">
-          <el-button v-if="perms.indexOf('2e')>-1 ||perms.indexOf('5')>-1 "
+          <el-button v-if="perms.indexOf('2u')>-1 ||perms.indexOf('5')>-1 "
             size="mini"
             @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
           <el-button v-if="perms.indexOf('2d')>-1 ||perms.indexOf('5')>-1 "
@@ -517,6 +517,7 @@
       return {
         formLabelWidth: '120px',
         list: null,
+        row:null,
         total: null,
         listLoading: true,
         defalutQuery:{
@@ -643,7 +644,7 @@
 
           document.onmousemove = function (ev) {
             var oevent = ev || event;
-            value.style.left = oevent.clientX - distanceX-360 + 'px';
+            value.style.left = oevent.clientX - distanceX + 'px';
             value.style.top = oevent.clientY - distanceY + 'px';
           };
           document.onmouseup = function () {
@@ -801,6 +802,7 @@
         this.temp.update_date = this.transferDate(date)
         console.log(this.temp)
         this.dialogFormVisible = true
+        this.row = row
       },
       handleDelete(index,row){
         console.log(row)
@@ -912,7 +914,9 @@
             })
           }
           this.dialogFormVisible = false
-          this.getList()
+          const index = this.list.indexOf(this.row)
+          console.log(index,this.list, this.temp,this.row)
+          this.list.splice(index,1,this.temp)
         }).catch(function (error) {
           console.log(error)
         })

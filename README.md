@@ -1,7 +1,8 @@
 # cmdb
 
 > A Vue.js project
->This is a project used for manage assets, including devices,vms,ip and domain.
+> This is a project used for manage assets, including devices,vms,ip and domain.
+> Using VueJs + Vuex + Vue-Router
 
 ## Build Setup
 
@@ -28,4 +29,4 @@ npm run e2e
 npm test
 ```
 
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+

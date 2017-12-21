@@ -338,6 +338,7 @@
         list: null,
         total: null,
         listLoading: true,
+        row:null,
         defalutQuery:{
           page: 1,
           pagesize: 20
@@ -420,26 +421,6 @@
       this.getList()
       console.log('geting list..')
 
-        var dialog = document.querySelectorAll("div.el-dialog")
-
-        dialog.onmousedown = function (ev) {
-          var oevent = ev || event;
-
-          var distanceX = oevent.clientX - dialog.offsetLeft;
-          var distanceY = oevent.clientY - dialog.offsetTop;
-
-          document.onmousemove = function (ev) {
-            var oevent = ev || event;
-            dialog.style.left = oevent.clientX - distanceX + 'px';
-            dialog.style.top = oevent.clientY - distanceY + 'px';
-          };
-          document.onmouseup = function () {
-            document.onmousemove = null;
-            document.onmouseup = null;
-          };
-
-        }
-
     },
     computed:{
       filterMessage: {
@@ -490,10 +471,10 @@
 
           var distanceX = oevent.clientX - value.offsetLeft;
           var distanceY = oevent.clientY - value.offsetTop;
-          console.log('%c%s%s%s%s%s%s%s%s','color:Yellow','Y:',distanceY,'X:',distanceX,'offsetL:',value.offsetLeft,'offsetT:',value.offsetTop)
+          console.log('%c%s%s%s%s%s%s%s%s','color:Red','Y:',distanceY,'X:',distanceX,'offsetL:',value.offsetLeft,'offsetT:',value.offsetTop)
           document.onmousemove = function (ev) {
             var oevent = ev || event;
-            value.style.left = oevent.clientX - distanceX -360+ 'px';
+            value.style.left = oevent.clientX - distanceX + 'px';
             value.style.top = oevent.clientY - distanceY + 'px';
           };
           document.onmouseup = function () {
@@ -505,12 +486,6 @@
 
 
     }
-//      dialog.addEventListener('mousedown',touchDown,false)
-//      document.addEventListener('mousemove',bodyMove,false)
-//      document.addEventListener('mouseup',touchUp,false)
-
-
-
     ,
     methods: {
       getList() {
@@ -611,6 +586,8 @@
         this.temp.update_date = this.transferDate(date)
         console.log(this.temp)
         this.dialogFormVisible = true
+        this.row=  row
+
       },
       //先确认
       handleDelete(index, row) {
@@ -729,7 +706,11 @@
               duration: 5000
             })
           }
-          this.getList()
+//          this.getList()
+
+          const index = this.list.indexOf(this.row)
+          console.log(index,this.list, this.temp,this.row)
+          this.list.splice(index,1,this.temp)
         }).catch(function (error) {
           console.log(error)
         })
@@ -871,6 +852,7 @@
 
           })
           this.getList()
+
         }
       },
       changeValue(value){

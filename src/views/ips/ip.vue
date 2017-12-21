@@ -289,7 +289,7 @@
 
           document.onmousemove = function (ev) {
             var oevent = ev || event;
-            value.style.left = oevent.clientX - distanceX-360 + 'px';
+            value.style.left = oevent.clientX - distanceX + 'px';
             value.style.top = oevent.clientY - distanceY + 'px';
           };
           document.onmouseup = function () {
