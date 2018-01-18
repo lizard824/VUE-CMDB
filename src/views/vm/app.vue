@@ -153,18 +153,18 @@
         <el-form-item label="老虎资产" :label-width="formLabelWidth" prop="lhzq_sn" >
           <el-input v-model="ctemp.lhzq_sn" auto-complete="off" ></el-input>
         </el-form-item>
-        <el-form-item label="机房" :label-width="formLabelWidth" prop="isp" >
-          <el-input v-model="ctemp.isp" auto-complete="off" ></el-input>
-        </el-form-item>
-        <el-form-item label="机柜" :label-width="formLabelWidth" prop="name" >
-          <el-input v-model="ctemp.name" auto-complete="off" ></el-input>
-        </el-form-item>
-        <el-form-item label="外网地址" :label-width="formLabelWidth" prop="ip1" >
-          <el-input v-model="ctemp.ip1" auto-complete="off" ></el-input>
-        </el-form-item>
-        <el-form-item label="内网地址" :label-width="formLabelWidth" prop="ip2" >
-          <el-input v-model="ctemp.ip2" auto-complete="off" ></el-input>
-        </el-form-item>
+        <!--<el-form-item label="机房" :label-width="formLabelWidth" prop="isp" >-->
+          <!--<el-input v-model="ctemp.isp" auto-complete="off" ></el-input>-->
+        <!--</el-form-item>-->
+        <!--<el-form-item label="机柜" :label-width="formLabelWidth" prop="name" >-->
+          <!--<el-input v-model="ctemp.name" auto-complete="off" ></el-input>-->
+        <!--</el-form-item>-->
+        <!--<el-form-item label="外网地址" :label-width="formLabelWidth" prop="ip1" >-->
+          <!--<el-input v-model="ctemp.ip1" auto-complete="off" ></el-input>-->
+        <!--</el-form-item>-->
+        <!--<el-form-item label="内网地址" :label-width="formLabelWidth" prop="ip2" >-->
+          <!--<el-input v-model="ctemp.ip2" auto-complete="off" ></el-input>-->
+        <!--</el-form-item>-->
         <el-form-item label="业务主类" :label-width="formLabelWidth" prop="main" >
           <el-input v-model="ctemp.main" auto-complete="off" ></el-input>
         </el-form-item>
@@ -202,15 +202,15 @@
         <el-form-item label="虚拟IP" :label-width="formLabelWidth" prop="vip" >
           <el-input v-model="ctemp.vip" auto-complete="off" ></el-input>
         </el-form-item>
-        <el-form-item label="厂商" :label-width="formLabelWidth" prop="oem" >
-          <el-input v-model="ctemp.oem" auto-complete="off" ></el-input>
-        </el-form-item>
-        <el-form-item label="型号" :label-width="formLabelWidth" prop="model" >
-          <el-input v-model="ctemp.model" auto-complete="off" ></el-input>
-        </el-form-item>
-        <el-form-item label="配置" :label-width="formLabelWidth" prop="config">
-          <el-input v-model="ctemp.config" auto-complete="off"></el-input>
-        </el-form-item>
+        <!--<el-form-item label="厂商" :label-width="formLabelWidth" prop="oem" >-->
+          <!--<el-input v-model="ctemp.oem" auto-complete="off" ></el-input>-->
+        <!--</el-form-item>-->
+        <!--<el-form-item label="型号" :label-width="formLabelWidth" prop="model" >-->
+          <!--<el-input v-model="ctemp.model" auto-complete="off" ></el-input>-->
+        <!--</el-form-item>-->
+        <!--<el-form-item label="配置" :label-width="formLabelWidth" prop="config">-->
+          <!--<el-input v-model="ctemp.config" auto-complete="off"></el-input>-->
+        <!--</el-form-item>-->
 
 
         <!--<el-form-item label="位置" :label-width="formLabelWidth" prop="gateway" >-->
@@ -235,18 +235,18 @@
           <el-form-item label="老虎资产" :label-width="formLabelWidth" prop="lhzq_sn" >
             <el-input v-model="temp.lhzq_sn" auto-complete="off" ></el-input>
           </el-form-item>
-          <el-form-item label="机房" :label-width="formLabelWidth" prop="isp" >
-            <el-input v-model="temp.isp" auto-complete="off" ></el-input>
-          </el-form-item>
-        <el-form-item label="机柜" :label-width="formLabelWidth" prop="name" >
-          <el-input v-model="temp.name" auto-complete="off" ></el-input>
-        </el-form-item>
-          <el-form-item label="外网地址" :label-width="formLabelWidth" prop="ip1" >
-            <el-input v-model="temp.ip1" auto-complete="off" ></el-input>
-          </el-form-item>
-          <el-form-item label="内网地址" :label-width="formLabelWidth" prop="ip2" >
-            <el-input v-model="temp.ip2" auto-complete="off" ></el-input>
-          </el-form-item>
+          <!--<el-form-item label="机房" :label-width="formLabelWidth" prop="isp" >-->
+            <!--<el-input v-model="temp.isp" auto-complete="off" ></el-input>-->
+          <!--</el-form-item>-->
+        <!--<el-form-item label="机柜" :label-width="formLabelWidth" prop="name" >-->
+          <!--<el-input v-model="temp.name" auto-complete="off" ></el-input>-->
+        <!--</el-form-item>-->
+          <!--<el-form-item label="外网地址" :label-width="formLabelWidth" prop="ip1" >-->
+            <!--<el-input v-model="temp.ip1" auto-complete="off" ></el-input>-->
+          <!--</el-form-item>-->
+          <!--<el-form-item label="内网地址" :label-width="formLabelWidth" prop="ip2" >-->
+            <!--<el-input v-model="temp.ip2" auto-complete="off" ></el-input>-->
+          <!--</el-form-item>-->
           <el-form-item label="业务主类" :label-width="formLabelWidth" prop="main" >
             <el-input v-model="temp.main" auto-complete="off" ></el-input>
           </el-form-item>
@@ -284,15 +284,15 @@
           <el-form-item label="虚拟IP" :label-width="formLabelWidth" prop="vip" >
             <el-input v-model="temp.vip" auto-complete="off" ></el-input>
           </el-form-item>
-          <el-form-item label="厂商" :label-width="formLabelWidth" prop="oem" >
-            <el-input v-model="temp.oem" auto-complete="off" ></el-input>
-          </el-form-item>
-          <el-form-item label="型号" :label-width="formLabelWidth" prop="model" >
-            <el-input v-model="temp.model" auto-complete="off" ></el-input>
-          </el-form-item>
-          <el-form-item label="配置" :label-width="formLabelWidth" prop="config">
-            <el-input v-model="temp.config" auto-complete="off"></el-input>
-          </el-form-item>
+          <!--<el-form-item label="厂商" :label-width="formLabelWidth" prop="oem" >-->
+            <!--<el-input v-model="temp.oem" auto-complete="off" ></el-input>-->
+          <!--</el-form-item>-->
+          <!--<el-form-item label="型号" :label-width="formLabelWidth" prop="model" >-->
+            <!--<el-input v-model="temp.model" auto-complete="off" ></el-input>-->
+          <!--</el-form-item>-->
+          <!--<el-form-item label="配置" :label-width="formLabelWidth" prop="config">-->
+            <!--<el-input v-model="temp.config" auto-complete="off"></el-input>-->
+          <!--</el-form-item>-->
 
 
           <!--<el-form-item label="位置" :label-width="formLabelWidth" prop="gateway" >-->
@@ -319,18 +319,18 @@
           <el-form-item label="老虎资产" :label-width="formLabelWidth" prop="lhzq_sn" >
             <el-input v-model="temp.lhzq_sn" auto-complete="off" ></el-input>
           </el-form-item>
-          <el-form-item label="机房" :label-width="formLabelWidth" prop="isp" >
-            <el-input v-model="temp.isp" auto-complete="off" ></el-input>
-          </el-form-item>
-        <el-form-item label="机柜" :label-width="formLabelWidth" prop="name" >
-          <el-input v-model="temp.name" auto-complete="off" ></el-input>
-        </el-form-item>
-          <el-form-item label="外网地址" :label-width="formLabelWidth" prop="ip1" >
-            <el-input v-model="temp.ip1" auto-complete="off" ></el-input>
-          </el-form-item>
-          <el-form-item label="内网地址" :label-width="formLabelWidth" prop="ip2" >
-            <el-input v-model="temp.ip2" auto-complete="off" ></el-input>
-          </el-form-item>
+          <!--<el-form-item label="机房" :label-width="formLabelWidth" prop="isp" >-->
+            <!--<el-input v-model="temp.isp" auto-complete="off" ></el-input>-->
+          <!--</el-form-item>-->
+        <!--<el-form-item label="机柜" :label-width="formLabelWidth" prop="name" >-->
+          <!--<el-input v-model="temp.name" auto-complete="off" ></el-input>-->
+        <!--</el-form-item>-->
+          <!--<el-form-item label="外网地址" :label-width="formLabelWidth" prop="ip1" >-->
+            <!--<el-input v-model="temp.ip1" auto-complete="off" ></el-input>-->
+          <!--</el-form-item>-->
+          <!--<el-form-item label="内网地址" :label-width="formLabelWidth" prop="ip2" >-->
+            <!--<el-input v-model="temp.ip2" auto-complete="off" ></el-input>-->
+          <!--</el-form-item>-->
           <el-form-item label="业务主类" :label-width="formLabelWidth" prop="main" >
             <el-input v-model="temp.main" auto-complete="off" ></el-input>
           </el-form-item>
@@ -368,15 +368,15 @@
           <el-form-item label="虚拟IP" :label-width="formLabelWidth" prop="vip" >
             <el-input v-model="temp.vip" auto-complete="off" ></el-input>
           </el-form-item>
-          <el-form-item label="厂商" :label-width="formLabelWidth" prop="oem" >
-            <el-input v-model="temp.oem" auto-complete="off" ></el-input>
-          </el-form-item>
-          <el-form-item label="型号" :label-width="formLabelWidth" prop="model" >
-            <el-input v-model="temp.model" auto-complete="off" ></el-input>
-          </el-form-item>
-          <el-form-item label="配置" :label-width="formLabelWidth" prop="config">
-            <el-input v-model="temp.config" auto-complete="off"></el-input>
-          </el-form-item>
+          <!--<el-form-item label="厂商" :label-width="formLabelWidth" prop="oem" >-->
+            <!--<el-input v-model="temp.oem" auto-complete="off" ></el-input>-->
+          <!--</el-form-item>-->
+          <!--<el-form-item label="型号" :label-width="formLabelWidth" prop="model" >-->
+            <!--<el-input v-model="temp.model" auto-complete="off" ></el-input>-->
+          <!--</el-form-item>-->
+          <!--<el-form-item label="配置" :label-width="formLabelWidth" prop="config">-->
+            <!--<el-input v-model="temp.config" auto-complete="off"></el-input>-->
+          <!--</el-form-item>-->
 
         </el-form>
 
@@ -442,15 +442,15 @@
           <el-form-item label="虚拟IP" :label-width="formLabelWidth" prop="vip" >
             <el-input v-model="listQuery.vip" auto-complete="off" ></el-input>
           </el-form-item>
-          <el-form-item label="厂商" :label-width="formLabelWidth" prop="oem" >
-            <el-input v-model="listQuery.oem" auto-complete="off" ></el-input>
-          </el-form-item>
-          <el-form-item label="型号" :label-width="formLabelWidth" prop="model" >
-            <el-input v-model="listQuery.model" auto-complete="off" ></el-input>
-          </el-form-item>
-          <el-form-item label="配置" :label-width="formLabelWidth" prop="config">
-            <el-input v-model="listQuery.config" auto-complete="off"></el-input>
-          </el-form-item>
+          <!--<el-form-item label="厂商" :label-width="formLabelWidth" prop="oem" >-->
+            <!--<el-input v-model="listQuery.oem" auto-complete="off" ></el-input>-->
+          <!--</el-form-item>-->
+          <!--<el-form-item label="型号" :label-width="formLabelWidth" prop="model" >-->
+            <!--<el-input v-model="listQuery.model" auto-complete="off" ></el-input>-->
+          <!--</el-form-item>-->
+          <!--<el-form-item label="配置" :label-width="formLabelWidth" prop="config">-->
+            <!--<el-input v-model="listQuery.config" auto-complete="off"></el-input>-->
+          <!--</el-form-item>-->
 
 
         </el-form>
@@ -553,52 +553,38 @@
         },
         //edit temp
         temp: {
-          id:null,
-          vip:null,
-          isp:null,
-          sub1: null,
-          sub2: null,
-          name: null,
-          os:null,
-          dev_owner:null,
-          lhzq_sn:null,
-          ip1:null,
-          ip2:null,
-          flag:null,
-          app_port:null,
-          oem:null,
-          main:null,
-          model:null,
-          app_version:null,
-          config:null,
-          op_owner:null,
-          create_date:null,
-          last_editor: null,
-          update_date: null
+          id:"",
+          vip:"",
+          sub1: "",
+          sub2: "",
+          os:"",
+          dev_owner:"",
+          lhzq_sn:"",
+          flag:"",
+          app_port:"",
+          main:"",
+          app_version:"",
+          op_owner:"",
+          create_date:"",
+          last_editor: "",
+          update_date: ""
         },
         //create temp without idc_id
         ctemp: {
-          vip:null,
-          isp:null,
-          sub1: null,
-          sub2: null,
-          name: null,
-          os:null,
-          dev_owner:null,
-          lhzq_sn:null,
-          ip1:null,
-          ip2:null,
-          flag:null,
-          app_port:null,
-          oem:null,
-          main:null,
-          model:null,
-          app_version:null,
-          config:null,
-          op_owner:null,
-          create_date:null,
-          last_editor: null,
-          update_date: null
+          vip:"",
+          sub1: "",
+          sub2: "",
+          os:"",
+          dev_owner:"",
+          lhzq_sn:"",
+          flag:"",
+          app_port:"",
+          main:"",
+          app_version:"",
+          op_owner:"",
+          create_date:"",
+          last_editor: "",
+          update_date: ""
         },
         textMap: {
           edit: 'Edit',
