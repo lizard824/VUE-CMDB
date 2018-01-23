@@ -498,6 +498,7 @@
         })
 
 
+
       },
       handleIconClick() {
         this.dialogSearchVisible = false
@@ -636,13 +637,20 @@
         console.log(this.ctemp)
       },
       handleDownload() {
-        require.ensure([], () => {
-          const { export_json_to_excel } = require('@/vendor/Export2Excel')
-          const tHeader = ['老虎资产', '厂商', '机房', '机柜', '外网地址','内网地址','宿主机资产','状态','配置','修改者','创建日期','更新日期']
-          const filterVal = ['vm_sn', 'oem', 'isp', 'name', 'ip1','ip2','lhzq_sn','status','config','last_editor','create_date','update_date']
-          const data = this.formatJson(filterVal, this.list)
-          export_json_to_excel(tHeader, data, '虚拟资产数据')
+        axios.get('http://cmdb.tigerbrokers.net:8000/vms/downloadVm').then(response=>{
+          console.log(response.data);
+          this.wholeList= response.data.data
+          require.ensure([], () => {
+            const { export_json_to_excel } = require('@/vendor/Export2Excel')
+            const tHeader = ['老虎资产', '厂商', '机房', '机柜', '外网地址','内网地址','宿主机资产','状态','配置','修改者','创建日期','更新日期']
+            const filterVal = ['vm_sn', 'oem', 'isp', 'name', 'ip1','ip2','lhzq_sn','status','config','last_editor','create_date','update_date']
+            const data = this.formatJson(filterVal, this.wholeList)
+            export_json_to_excel(tHeader, data, '虚拟资产数据')
+          })
+        }).catch((err)=> {
+          console.log(err)
         })
+
       },
       formatJson(filterVal, jsonData) {
         return jsonData.map(v => filterVal.map(j => {

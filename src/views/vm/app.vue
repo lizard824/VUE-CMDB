@@ -719,6 +719,7 @@
         })
 
 
+
       },
       handleIconClick() {
         this.dialogSearchVisible = false
@@ -842,13 +843,20 @@
         console.log(this.ctemp)
       },
       handleDownload() {
-        require.ensure([], () => {
-          const { export_json_to_excel } = require('@/vendor/Export2Excel')
-          const tHeader = ['老虎资产', '机房', '机柜',  '外网地址','内网地址','业务主类','业务子类1','业务子类2','版本','端口','状态','操作系统','运维者','开发者','虚拟IP','配置','厂商','型号','创建日期','修改日期','修改者']
-          const filterVal = ['lhzq_sn', 'isp', 'name',  'ip1','ip2','main','sub1','sub2','app_version','app_port','flag','os','op_owner','dev_owner','vip','config','oem','model','create_date','update_date','last_editor']
-          const data = this.formatJson(filterVal, this.list)
-          export_json_to_excel(tHeader, data, '应用数据')
+        axios.get('http://cmdb.tigerbrokers.net:8000/apps/downloadApp').then(response=>{
+          console.log(response.data);
+          this.wholeList= response.data.data
+          require.ensure([], () => {
+            const { export_json_to_excel } = require('@/vendor/Export2Excel')
+            const tHeader = ['老虎资产', '机房', '机柜',  '外网地址','内网地址','业务主类','业务子类1','业务子类2','版本','端口','状态','操作系统','运维者','开发者','虚拟IP','配置','厂商','型号','创建日期','修改日期','修改者']
+            const filterVal = ['lhzq_sn', 'isp', 'name',  'ip1','ip2','main','sub1','sub2','app_version','app_port','flag','os','op_owner','dev_owner','vip','config','oem','model','create_date','update_date','last_editor']
+            const data = this.formatJson(filterVal, this.wholeList)
+            export_json_to_excel(tHeader, data, '应用数据')
+          })
+        }).catch((err)=> {
+          console.log(err)
         })
+
       },
       formatJson(filterVal, jsonData) {
         return jsonData.map(v => filterVal.map(j => {

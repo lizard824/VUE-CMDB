@@ -658,6 +658,9 @@
         })
 
 
+
+
+
       },
       handleIconClick() {
         this.dialogSearchVisible = false
@@ -796,13 +799,21 @@
         console.log(this.ctemp)
       },
       handleDownload() {
-        require.ensure([], () => {
-          const { export_json_to_excel } = require('@/vendor/Export2Excel')
-          const tHeader = ['SN', '服务码', '老虎资产', '设备类别', '厂商','型号','机房','城市','位置','机柜','外网地址','内网地址','管理地址','状态','配置','购买时间','续保时间','续保过期','修改者','创建日期','更新日期']
-          const filterVal = ['sn', 'code', 'lhzq_sn', 'asset_type', 'oem','model','isp','city','position','name','ip1','ip2','ip3','status','config','buy_time','Renewal_first','Renewal_expiration','last_editor','create_date','update_date']
-          const data = this.formatJson(filterVal, this.list)
-          export_json_to_excel(tHeader, data, '物理资产数据')
-        })
+        axios.get('http://cmdb.tigerbrokers.net:8000/devices/downloadDevice').then(response=>{
+        console.log(response.data);
+        this.wholeList= response.data.data
+          require.ensure([], () => {
+            const { export_json_to_excel } = require('@/vendor/Export2Excel')
+            const tHeader = ['SN', '服务码', '老虎资产', '设备类别', '厂商','型号','机房','城市','位置','机柜','外网地址','内网地址','管理地址','状态','配置','购买时间','续保时间','续保过期','修改者','创建日期','更新日期']
+            const filterVal = ['sn', 'code', 'lhzq_sn', 'asset_type', 'oem','model','isp','city','position','name','ip1','ip2','ip3','status','config','buy_time','Renewal_first','Renewal_expiration','last_editor','create_date','update_date']
+            const data = this.formatJson(filterVal, this.wholeList)
+            export_json_to_excel(tHeader, data, '物理资产数据')
+          })
+
+      }).catch((err)=> {
+        console.log(err)
+      })
+
       },
       formatJson(filterVal, jsonData) {
         return jsonData.map(v => filterVal.map(j => {

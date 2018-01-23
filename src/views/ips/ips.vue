@@ -384,6 +384,7 @@
         })
 
 
+
       },
       handleIconClick() {
         this.dialogSearchVisible = false
@@ -476,13 +477,22 @@
         console.log(this.ctemp)
       },
       handleDownload() {
-        require.ensure([], () => {
-          const { export_json_to_excel } = require('@/vendor/Export2Excel')
-          const tHeader = ['网段', '掩码', '网关', '运营商','城市','位置','修改者','创建时间','更新日期']
-          const filterVal = [ 'ip_segment', 'netmask', 'gateway', 'isp','city','position','last_editor','create_date','update_date']
-          const data = this.formatJson(filterVal, this.list)
-          export_json_to_excel(tHeader, data, 'ips数据')
+        axios.get('http://cmdb.tigerbrokers.net:8000/ips/downloadIps').then(response=>{
+          console.log(response.data);
+          this.wholeList= response.data.data
+          require.ensure([], () => {
+            const { export_json_to_excel } = require('@/vendor/Export2Excel')
+            const tHeader = ['网段', '掩码', '网关', '运营商','城市','位置','修改者','创建时间','更新日期']
+            const filterVal = [ 'ip_segment', 'netmask', 'gateway', 'isp','city','position','last_editor','create_date','update_date']
+            const data = this.formatJson(filterVal, this.wholeList)
+            export_json_to_excel(tHeader, data, 'ips数据')
+          })
+
+        }).catch((err)=> {
+          console.log(err)
         })
+
+
       },
       formatJson(filterVal, jsonData) {
         return jsonData.map(v => filterVal.map(j => {

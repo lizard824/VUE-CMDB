@@ -502,6 +502,7 @@
         })
 
 
+
       },
       handleIconClick() {
         this.dialogSearchVisible = false
@@ -647,13 +648,21 @@
       },
       //下载
       handleDownload() {
-        require.ensure([], () => {
-          const {export_json_to_excel} = require('@/vendor/Export2Excel')
-          const tHeader = [ '运营商', '线路', '带宽', '机柜数','城市','位置','报障电话','状态','修改者','创建日期','更新日期']
-          const filterVal = ['isp', 'line', 'bandwidth', 'racks','city','position','telephone','status','last_editor','create_date','update_date']
-          const data = this.formatJson(filterVal, this.list)
-          export_json_to_excel(tHeader, data, 'idc数据')
+        axios.get('http://cmdb.tigerbrokers.net:8000/idcs/downloadIdc').then(response=>{
+          console.log(response.data);
+          this.wholeList= response.data.data
+          require.ensure([], () => {
+            const {export_json_to_excel} = require('@/vendor/Export2Excel')
+            const tHeader = [ '运营商', '线路', '带宽', '机柜数','城市','位置','报障电话','状态','修改者','创建日期','更新日期']
+            const filterVal = ['isp', 'line', 'bandwidth', 'racks','city','position','telephone','status','last_editor','create_date','update_date']
+            const data = this.formatJson(filterVal, this.wholeList)
+            export_json_to_excel(tHeader, data, 'idc数据')
+          })
+        }).catch((err)=> {
+          console.log(err)
         })
+
+
       },
       formatJson(filterVal, jsonData) {
         return jsonData.map(v => filterVal.map(j => {
