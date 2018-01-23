@@ -1,5 +1,5 @@
 
-
+//dialog drag module
 export function move() {
 
   window.onload = function () {

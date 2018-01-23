@@ -261,6 +261,7 @@
       return {
         formLabelWidth: '120px',
         list: null,
+        wholeList:null,
         total: null,
         row:null,
         listLoading: true,
